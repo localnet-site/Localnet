@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localnet - Social</title>
+    <title>Localnet Cloud</title>
     <style>
         /* Base e Fundo */
         html, body {
@@ -60,7 +60,6 @@
             z-index: 200; width: 320px; border: 1px solid #444; text-align: center;
         }
 
-        /* GRID SOBRE MIM */
         #about-list {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
             margin-top: 20px; max-height: 200px; overflow-y: auto; padding: 5px;
@@ -72,20 +71,9 @@
             position: relative; transition: 0.3s; min-height: 40px;
         }
         
-        .item-actions {
-            position: absolute; top: 5px; right: 5px;
-            display: none; gap: 4px;
-        }
-
+        .item-actions { position: absolute; top: 5px; right: 5px; display: none; gap: 4px; }
         .about-item:hover .item-actions { display: flex; }
-
-        .action-btn {
-            background: rgba(0,0,0,0.5); border: none; color: white;
-            font-size: 10px; padding: 2px 5px; border-radius: 4px; cursor: pointer;
-        }
-        .action-btn.edit:hover { color: #ffcc00; }
-        .action-btn.del:hover { color: #ff4444; }
-
+        .action-btn { background: rgba(0,0,0,0.5); border: none; color: white; font-size: 10px; padding: 2px 5px; border-radius: 4px; cursor: pointer; }
         .about-item b { color: #ffcc00; display: block; margin-bottom: 2px; text-transform: uppercase; font-size: 9px; }
 
         /* FEED */
@@ -101,7 +89,6 @@
         }
 
         .delete-btn { background: none; color: #ff4444; border: none; padding: 5px; cursor: pointer; }
-
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 150; }
         input[type="file"] { display: none; }
     </style>
@@ -109,37 +96,37 @@
 <body>
 
     <div id="login-screen">
-        <h1>Localnet</h1>
+        <h1>Localnet Cloud</h1>
         <input type="text" id="login-user" placeholder="Usuário">
         <input type="password" id="login-pass" placeholder="Senha">
         <div style="display:flex; gap:10px; justify-content: center;">
-            <button onclick="fazerLogin()">ENTRAR</button>
-            <button onclick="criarConta()">CRIAR CONTA</button>
+            <button id="btn-entrar">ENTRAR</button>
+            <button id="btn-criar">CRIAR CONTA</button>
         </div>
         <p id="msg-erro" style="color: #ff6b6b; font-size: 13px; margin-top: 15px;"></p>
     </div>
 
     <div id="main-page">
         <div style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: center;">
-            <button onclick="togglePosts()">POSTS</button>
+            <button id="btn-toggle-posts">POSTS</button>
         </div>
 
-        <div class="upload-box profile-trigger" onclick="openProfile()">
+        <div class="upload-box profile-trigger" id="open-profile-btn">
             <img id="main-avatar" style="width:100%; height:100%; object-fit:cover; display:none;">
             <span id="main-icon" style="font-size: 25px;">👤</span>
         </div>
         <div class="upload-box bg-upload" onclick="document.getElementById('bg-input').click()"><span>🖼️</span></div>
-        <div class="upload-box logout-btn" onclick="logout()"><span>🚪</span></div>
-        <div class="upload-box about-me-btn" onclick="openAbout()"><span>⭐</span></div>
+        <div class="upload-box logout-btn" id="btn-logout"><span>🚪</span></div>
+        <div class="upload-box about-me-btn" id="open-about-btn"><span>⭐</span></div>
 
         <div id="posts-section">
             <textarea id="post-text" placeholder="No que você está pensando?" style="height: 80px;"></textarea>
-            <button onclick="publicarPost()" style="width: 100%">Publicar</button>
+            <button id="btn-publicar" style="width: 100%">Publicar</button>
             <div id="feed"></div>
         </div>
     </div>
 
-    <div class="overlay" id="overlay" onclick="closeModals()"></div>
+    <div class="overlay" id="overlay"></div>
 
     <div id="profile-modal" class="modal">
         <div style="display: flex; align-items: center; gap: 15px; text-align: left;">
@@ -149,7 +136,7 @@
                 <textarea id="bio-input" placeholder="Sua bio..." style="width: 150px; height: 50px; font-size: 11px; margin:0"></textarea>
             </div>
         </div>
-        <button onclick="closeModals()" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
+        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
     </div>
 
     <div id="about-modal" class="modal" style="width: 340px;">
@@ -158,9 +145,9 @@
             <input type="text" id="about-title" placeholder="Título" style="margin:0; font-size: 12px; flex:1">
             <input type="text" id="about-desc" placeholder="Resposta" style="margin:0; font-size: 12px; flex:1">
         </div>
-        <button onclick="adicionarSobre()" id="btn-add-about" style="width: 100%; margin-top: 10px; background: #ffcc00; color: #000; font-size: 12px;">ADICIONAR ITEM</button>
+        <button id="btn-add-about" style="width: 100%; margin-top: 10px; background: #ffcc00; color: #000; font-size: 12px;">ADICIONAR ITEM</button>
         <div id="about-list"></div>
-        <button onclick="closeModals()" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
+        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
     </div>
 
     <div id="confirm-modal" class="modal">
@@ -172,19 +159,31 @@
         </div>
     </div>
 
-    <input type="file" id="profile-input" accept="image/*" onchange="atualizarFotoPerfil(event)">
-    <input type="file" id="bg-input" accept="image/*" onchange="atualizarFundo(event)">
+    <input type="file" id="profile-input" accept="image/*">
+    <input type="file" id="bg-input" accept="image/*">
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, get, child, remove, update } 
+        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // CONFIGURAÇÃO VINDA DA SUA IMAGEM
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdfasR5Z2Cd7ETQ2p_RreRkYK2q5pdlXI",
+            authDomain: "localnet-45a7f.firebaseapp.com",
+            projectId: "localnet-45a7f",
+            storageBucket: "localnet-45a7f.firebasestorage.app",
+            messagingSenderId: "54266406528",
+            appId: "1:54266406528:web:5df0ac496ed214290f6865",
+            databaseURL: "https://localnet-45a7f-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
         let currentUser = "";
         let indexParaEditar = null;
 
-        window.onload = () => {
-            const logged = localStorage.getItem('loggedUser');
-            if (logged) abrirSessao(logged);
-        };
-
-        // --- FUNÇÃO DE TEMPO (RECUPERADA) ---
         function calcularTempo(dataPostMs) {
             const agora = new Date().getTime();
             const diferenca = agora - dataPostMs;
@@ -197,145 +196,175 @@
             return new Date(dataPostMs).toLocaleDateString('pt-BR');
         }
 
-        function criarConta() {
-            const user = document.getElementById('login-user').value.trim();
+        async function criarConta() {
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
             if (!user || !pass) return;
-            let usuarios = JSON.parse(localStorage.getItem('usuarios') || "{}");
-            if (usuarios[user]) { 
-                document.getElementById('msg-erro').innerText = "Usuário já existe!"; 
+
+            const snapshot = await get(child(ref(db), `usuarios/${user}`));
+            if (snapshot.exists()) {
+                document.getElementById('msg-erro').innerText = "Usuário já existe!";
             } else {
-                usuarios[user] = { senha: pass, posts: [], avatar: "", bg: "", bio: "", sobre: [] };
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
+                await set(ref(db, `usuarios/${user}`), {
+                    senha: pass,
+                    bio: "",
+                    avatar: "",
+                    bg: "",
+                    sobre: []
+                });
                 document.getElementById('msg-erro').style.color = "#4ade80";
-                document.getElementById('msg-erro').innerText = "Conta criada!";
+                document.getElementById('msg-erro').innerText = "Conta criada! Pode logar.";
             }
         }
 
-        function fazerLogin() {
-            const user = document.getElementById('login-user').value.trim();
+        async function fazerLogin() {
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
-            const usuarios = JSON.parse(localStorage.getItem('usuarios') || "{}");
-            if (usuarios[user] && usuarios[user].senha === pass) {
+            
+            const snapshot = await get(child(ref(db), `usuarios/${user}`));
+            if (snapshot.exists() && snapshot.val().senha === pass) {
                 localStorage.setItem('loggedUser', user);
                 abrirSessao(user);
-            } else { 
-                document.getElementById('msg-erro').innerText = "Dados incorretos."; 
+            } else {
+                document.getElementById('msg-erro').innerText = "Dados incorretos.";
             }
         }
 
         function abrirSessao(user) {
             currentUser = user;
-            const dados = JSON.parse(localStorage.getItem('usuarios'))[user];
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('modal-name').innerText = user;
-            document.getElementById('bio-input').value = dados.bio || "";
-            if (dados.avatar) {
-                document.getElementById('main-avatar').src = dados.avatar;
-                document.getElementById('main-avatar').style.display = 'block';
-                document.getElementById('main-icon').style.display = 'none';
-                document.getElementById('modal-avatar-img').src = dados.avatar;
-            }
-            if (dados.bg) document.body.style.backgroundImage = `url('${dados.bg}')`;
-            recarregarFeed();
+
+            onValue(ref(db, `usuarios/${user}`), (snapshot) => {
+                const dados = snapshot.val();
+                if(!dados) return;
+                document.getElementById('bio-input').value = dados.bio || "";
+                if (dados.avatar) {
+                    document.getElementById('main-avatar').src = dados.avatar;
+                    document.getElementById('main-avatar').style.display = 'block';
+                    document.getElementById('main-icon').style.display = 'none';
+                    document.getElementById('modal-avatar-img').src = dados.avatar;
+                }
+                if (dados.bg) document.body.style.backgroundImage = `url('${dados.bg}')`;
+                recarregarSobre(dados.sobre);
+            });
+
+            onValue(ref(db, 'posts'), (snapshot) => {
+                recarregarFeed(snapshot.val());
+            });
         }
 
         function publicarPost() {
             const text = document.getElementById('post-text').value.trim();
             if (!text) return;
-            const timestamp = new Date().getTime();
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            usuarios[currentUser].posts.push({ id: timestamp, texto: text, dataMs: timestamp });
-            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+            const newPostRef = push(ref(db, 'posts'));
+            set(newPostRef, {
+                texto: text,
+                autor: currentUser,
+                dataMs: new Date().getTime(),
+                id: newPostRef.key
+            });
             document.getElementById('post-text').value = "";
-            recarregarFeed();
         }
 
-        function recarregarFeed() {
-            const feed = document.getElementById('feed'); feed.innerHTML = "";
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            const avatar = usuarios[currentUser].avatar;
-            const posts = usuarios[currentUser].posts || [];
-            
-            [...posts].reverse().forEach(p => {
+        function recarregarFeed(postsObj) {
+            const feed = document.getElementById('feed');
+            feed.innerHTML = "";
+            if (!postsObj) return;
+
+            const postsArray = Object.values(postsObj).reverse();
+            postsArray.forEach(p => {
                 const post = document.createElement('div');
                 post.className = 'post-card';
-                const tempo = p.dataMs ? calcularTempo(p.dataMs) : "antigo"; // Recalcula o tempo aqui
-                const img = avatar ? `<img src="${avatar}" style="width:30px; height:30px; border-radius:5px; object-fit:cover; margin-right:10px">` : "👤 ";
-                
+                const tempo = calcularTempo(p.dataMs);
+                const delBtn = p.autor === currentUser ? 
+                    `<button class="delete-btn" data-id="${p.id}">🗑️</button>` : "";
+
                 post.innerHTML = `
                     <div style="display:flex; justify-content: space-between; align-items: center;">
                         <div style="display:flex; align-items:center;">
-                            ${img}
+                            <div style="width:30px; height:30px; background:#444; border-radius:5px; margin-right:10px; display:flex; align-items:center; justify-content:center;">👤</div>
                             <div>
-                                <strong style="display:block; line-height:1;">${currentUser}</strong>
+                                <strong style="display:block; line-height:1;">${p.autor}</strong>
                                 <span style="font-size:10px; color:#888;">${tempo}</span>
                             </div>
                         </div>
-                        <button class="delete-btn" onclick="confirmarExcluirPost(${p.id})">🗑️</button>
+                        ${delBtn}
                     </div>
                     <div style="padding-left:40px; margin-top:10px; color:#ddd; font-size:14px;">${p.texto}</div>`;
+                
                 feed.appendChild(post);
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const id = btn.getAttribute('data-id');
+                    abrirModalConfirm("Excluir Post?", "Quer apagar seu post?", () => {
+                        remove(ref(db, `posts/${id}`));
+                    });
+                };
             });
         }
 
-        // --- SOBRE MIM ---
-        function openAbout() {
-            document.getElementById('about-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-            recarregarSobre();
-        }
-
-        function adicionarSobre() {
+        async function adicionarSobre() {
             const t = document.getElementById('about-title').value.trim();
             const d = document.getElementById('about-desc').value.trim();
             if (!t || !d) return;
 
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            if (!usuarios[currentUser].sobre) usuarios[currentUser].sobre = [];
-            
+            const snapshot = await get(child(ref(db), `usuarios/${currentUser}/sobre`));
+            let sobre = snapshot.val() || [];
+
             if (indexParaEditar !== null) {
-                usuarios[currentUser].sobre[indexParaEditar] = { titulo: t, desc: d };
+                sobre[indexParaEditar] = { titulo: t, desc: d };
                 indexParaEditar = null;
                 document.getElementById('btn-add-about').innerText = "ADICIONAR ITEM";
             } else {
-                usuarios[currentUser].sobre.push({ titulo: t, desc: d });
+                sobre.push({ titulo: t, desc: d });
             }
-            
-            localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+            await update(ref(db, `usuarios/${currentUser}`), { sobre: sobre });
             document.getElementById('about-title').value = "";
             document.getElementById('about-desc').value = "";
-            recarregarSobre();
         }
 
-        function recarregarSobre() {
-            const list = document.getElementById('about-list'); list.innerHTML = "";
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            const itens = usuarios[currentUser].sobre || [];
+        function recarregarSobre(itens) {
+            const list = document.getElementById('about-list');
+            list.innerHTML = "";
+            if (!itens) return;
             itens.forEach((item, index) => {
                 const div = document.createElement('div');
                 div.className = 'about-item';
                 div.innerHTML = `
                     <div class="item-actions">
-                        <button class="action-btn edit" onclick="editarSobre(${index})">✏️</button>
-                        <button class="action-btn del" onclick="confirmarExcluirSobre(${index})">🗑️</button>
+                        <button class="action-btn-edit" data-idx="${index}">✏️</button>
+                        <button class="action-btn-del" data-idx="${index}">🗑️</button>
                     </div>
                     <b>${item.titulo}</b> ${item.desc}`;
                 list.appendChild(div);
             });
+
+            document.querySelectorAll('.action-btn-edit').forEach(b => {
+                b.onclick = () => {
+                    const idx = b.getAttribute('data-idx');
+                    document.getElementById('about-title').value = itens[idx].titulo;
+                    document.getElementById('about-desc').value = itens[idx].desc;
+                    indexParaEditar = idx;
+                    document.getElementById('btn-add-about').innerText = "SALVAR ALTERAÇÃO";
+                };
+            });
+
+            document.querySelectorAll('.action-btn-del').forEach(b => {
+                b.onclick = () => {
+                    const idx = b.getAttribute('data-idx');
+                    abrirModalConfirm("Excluir Item?", "Apagar do Sobre Mim?", async () => {
+                        itens.splice(idx, 1);
+                        await update(ref(db, `usuarios/${currentUser}`), { sobre: itens });
+                    });
+                };
+            });
         }
 
-        function editarSobre(index) {
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            const item = usuarios[currentUser].sobre[index];
-            document.getElementById('about-title').value = item.titulo;
-            document.getElementById('about-desc').value = item.desc;
-            indexParaEditar = index;
-            document.getElementById('btn-add-about').innerText = "SALVAR ALTERAÇÃO";
-        }
-
-        // --- CONFIRMAÇÃO ---
         function abrirModalConfirm(titulo, texto, acao) {
             document.getElementById('confirm-title').innerText = titulo;
             document.getElementById('confirm-text').innerText = texto;
@@ -345,66 +374,53 @@
             document.getElementById('btn-confirm-no').onclick = closeModals;
         }
 
-        function confirmarExcluirPost(id) {
-            abrirModalConfirm("Excluir Post?", "Você quer mesmo apagar esse post?", () => {
-                const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-                usuarios[currentUser].posts = usuarios[currentUser].posts.filter(p => p.id !== id);
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                recarregarFeed();
-            });
-        }
-
-        function confirmarExcluirSobre(index) {
-            abrirModalConfirm("Excluir Item?", "Apagar essa informação do 'Sobre Mim'?", () => {
-                const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-                usuarios[currentUser].sobre.splice(index, 1);
-                localStorage.setItem('usuarios', JSON.stringify(usuarios));
-                recarregarSobre();
-            });
-        }
-
-        // --- UTILITÁRIOS ---
         function closeModals() {
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-            if (document.getElementById('main-page').style.display === 'block') {
-                document.getElementById('overlay').style.display = 'none';
-            }
+            document.getElementById('overlay').style.display = 'none';
             indexParaEditar = null;
-            document.getElementById('btn-add-about').innerText = "ADICIONAR ITEM";
         }
 
-        function openProfile() {
+        document.getElementById('btn-entrar').onclick = fazerLogin;
+        document.getElementById('btn-criar').onclick = criarConta;
+        document.getElementById('btn-logout').onclick = () => { localStorage.removeItem('loggedUser'); location.reload(); };
+        document.getElementById('btn-toggle-posts').onclick = () => {
+            const s = document.getElementById('posts-section');
+            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        };
+        document.getElementById('open-profile-btn').onclick = () => {
             document.getElementById('profile-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
-        }
+        };
+        document.getElementById('open-about-btn').onclick = () => {
+            document.getElementById('about-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        };
+        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = closeModals);
+        document.getElementById('btn-publicar').onclick = publicarPost;
+        document.getElementById('btn-add-about').onclick = adicionarSobre;
 
-        function logout() { localStorage.removeItem('loggedUser'); location.reload(); }
-        function togglePosts() { 
-            const s = document.getElementById('posts-section'); 
-            s.style.display = (s.style.display === 'block') ? 'none' : 'block'; 
-        }
-
-        function salvarNoBanco(campo, valor) {
-            const usuarios = JSON.parse(localStorage.getItem('usuarios'));
-            usuarios[currentUser][campo] = valor;
-            localStorage.setItem('usuarios', JSON.stringify(usuarios));
-        }
-
-        function atualizarFotoPerfil(event) {
+        document.getElementById('profile-input').onchange = (e) => {
             const reader = new FileReader();
-            reader.onload = () => { salvarNoBanco('avatar', reader.result); location.reload(); };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-
-        function atualizarFundo(event) {
-            const reader = new FileReader();
-            reader.onload = () => { 
-                document.body.style.backgroundImage = `url('${reader.result}')`; 
-                salvarNoBanco('bg', reader.result); 
+            reader.onload = async () => {
+                await update(ref(db, `usuarios/${currentUser}`), { avatar: reader.result });
             };
-            reader.readAsDataURL(event.target.files[0]);
-        }
-        document.getElementById('bio-input').onchange = (e) => salvarNoBanco('bio', e.target.value);
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        document.getElementById('bg-input').onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = async () => {
+                await update(ref(db, `usuarios/${currentUser}`), { bg: reader.result });
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        document.getElementById('bio-input').onblur = async (e) => {
+            await update(ref(db, `usuarios/${currentUser}`), { bio: e.target.value });
+        };
+
+        const logged = localStorage.getItem('loggedUser');
+        if (logged) abrirSessao(logged);
     </script>
 </body>
 </html>
