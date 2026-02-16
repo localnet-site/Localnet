@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localnet Cloud - Media & Profile</title>
+    <title>Localnet Cloud - Full Version</title>
     <style>
         html, body { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; overflow: hidden; }
         body { background-size: cover; background-position: center; transition: background 0.5s ease; display: flex; justify-content: center; align-items: center; }
@@ -15,31 +15,33 @@
         
         /* MAIN PAGE */
         #main-page { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(30, 30, 30, 0.8); position: absolute; transition: all 0.3s ease; overflow: hidden; }
+        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(30, 30, 30, 0.8); position: absolute; transition: all 0.3s ease; overflow: hidden; z-index: 10; }
         .profile-trigger { width: 70px; height: 70px; top: 20px; left: 20px; }
         .bg-upload { width: 45px; height: 45px; top: 105px; left: 20px; }
         .logout-btn { width: 45px; height: 45px; top: 165px; left: 20px; border-color: #ff4444; color: #ff4444; }
         .about-me-btn { width: 45px; height: 45px; top: 20px; right: 20px; border-color: #ffcc00; color: #ffcc00; }
         #btn-usuarios { width: 45px; height: 45px; top: 20px; right: 80px; border-color: #00ff88; color: #00ff88; font-size: 20px; }
-        
+        .admin-btn { width: 50px; height: 50px; bottom: 20px; right: 20px; border-color: #ff0055; color: #ff0055; font-size: 22px; }
+
         /* MODAIS */
         .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 25px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.9); z-index: 200; width: 320px; border: 1px solid #444; text-align: center; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 150; }
 
-        /* POSTS E IMAGENS */
+        /* FEED E POSTS */
         #posts-section { display: none; width: 90%; max-width: 450px; margin: 90px auto; background: rgba(20, 20, 20, 0.9); border-radius: 15px; padding: 20px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; backdrop-filter: blur(10px); }
         .post-card { background: #252525; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #fff; text-align: left; }
         .post-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-top: 10px; border: 1px solid #444; }
         .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; display: none; margin: 10px auto; border: 2px solid #00ff88; }
-        .btn-attach { background: #333; color: white; border-radius: 8px; padding: 10px; cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; }
-
-        /* LISTA USUARIOS */
-        .user-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; text-align: left; }
+        
+        /* LISTAS (USUARIOS / SOBRE) */
+        .user-item, .admin-user-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; text-align: left; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; }
         .online { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
         .offline { background-color: #555; }
+        #about-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-height: 150px; overflow-y: auto; }
+        .about-item { background: #2a2a2a; padding: 8px; border-radius: 8px; font-size: 11px; text-align: left; position: relative; }
+        .about-item b { color: #ffcc00; display: block; font-size: 9px; }
 
-        /* ESCONDER INPUTS PADRÃO */
         input[type="file"] { display: none !important; }
     </style>
 </head>
@@ -69,12 +71,13 @@
         <div class="upload-box logout-btn" id="btn-logout"><span>🚪</span></div>
         <div class="upload-box about-me-btn" id="open-about-btn"><span>⭐</span></div>
         <div class="upload-box" id="btn-usuarios"><span>🌐</span></div>
+        <div class="upload-box admin-btn" id="btn-admin-panel"><span>🛡️</span></div>
 
         <div id="posts-section">
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <textarea id="post-text" placeholder="No que está pensando?" style="height: 50px; flex: 1; margin: 0;"></textarea>
-                    <div class="btn-attach" onclick="document.getElementById('post-image-input').click()">📎</div>
+                    <div style="background:#333; padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('post-image-input').click()">📎</div>
                 </div>
                 <img id="post-preview" class="preview-img">
                 <button id="btn-publicar" style="width: 100%; background: #00ff88; color: black;">PUBLICAR</button>
@@ -83,35 +86,48 @@
         </div>
     </div>
 
-    <div id="view-profile-modal" class="modal">
-        <img id="view-avatar-img" style="width:100px; height:100px; border-radius:50%; border:3px solid #00ff88; object-fit:cover; margin-bottom: 10px;">
-        <h2 id="view-modal-name" style="margin:0; color:#00ff88;"></h2>
-        <div style="background: #2a2a2a; padding: 10px; border-radius: 10px; margin-top: 10px; text-align: left; font-size: 13px; border-left: 3px solid #00ff88;">
-            <b>BIO:</b> <span id="view-bio-text"></span>
-        </div>
-        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #444; color: white;">Fechar</button>
-    </div>
-
-    <div id="users-modal" class="modal">
-        <h3 style="color:#00ff88; margin-top:0;">Membros da Rede</h3>
-        <div id="users-list-modal" style="max-height: 200px; overflow-y: auto;"></div>
-        <button class="btn-fechar" style="margin-top: 15px; width: 100%;">Fechar</button>
-    </div>
-
     <div id="profile-modal" class="modal">
         <img id="modal-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid white; object-fit:cover;" onclick="document.getElementById('profile-input').click()">
-        <h2 id="modal-name" style="margin: 10px 0;"></h2>
-        <textarea id="bio-input" placeholder="Escreva sua bio..."></textarea>
+        <h2 id="modal-name">Meu Perfil</h2>
+        <textarea id="bio-input" placeholder="Sua bio..."></textarea>
         <button class="btn-fechar" style="width: 100%; background: #00ff88; color: black;">Salvar e Sair</button>
     </div>
 
     <div id="about-modal" class="modal" style="width: 340px;">
-        <h3 style="color:#ffcc00; margin-top:0;">Meu Sobre Mim</h3>
+        <h3 style="color:#ffcc00;">Meu Sobre Mim</h3>
         <input type="text" id="about-title" placeholder="Título">
         <input type="text" id="about-desc" placeholder="Resposta">
         <button id="btn-add-about" style="width: 100%; background: #ffcc00; color: black;">ADICIONAR</button>
-        <div id="about-list" style="max-height: 150px; overflow-y: auto; margin-top: 10px;"></div>
+        <div id="about-list"></div>
         <button class="btn-fechar" style="margin-top: 10px; width: 100%;">Fechar</button>
+    </div>
+
+    <div id="view-profile-modal" class="modal">
+        <img id="view-avatar-img" style="width:100px; height:100px; border-radius:50%; border:3px solid #00ff88; object-fit:cover; margin-bottom: 10px;">
+        <h2 id="view-modal-name" style="color:#00ff88;"></h2>
+        <div style="background: #2a2a2a; padding: 10px; border-radius: 10px; text-align: left; font-size: 13px; border-left: 3px solid #00ff88;">
+            <b>BIO:</b> <span id="view-bio-text"></span>
+        </div>
+        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #444;">Fechar</button>
+    </div>
+
+    <div id="users-modal" class="modal">
+        <h3 style="color:#00ff88;">Membros</h3>
+        <div id="users-list-modal" style="max-height: 200px; overflow-y: auto;"></div>
+        <button class="btn-fechar" style="margin-top: 10px; width: 100%;">Fechar</button>
+    </div>
+
+    <div id="admin-auth-modal" class="modal">
+        <h3>ADM Login</h3>
+        <input type="password" id="admin-pass-input" placeholder="Chave Mestre">
+        <button id="btn-acessar-admin" style="width: 100%; background: #ff0055; color: white;">ACESSAR</button>
+        <button class="btn-fechar" style="margin-top: 10px; width: 100%; background: #333;">Sair</button>
+    </div>
+
+    <div id="admin-list-modal" class="modal" style="width: 350px;">
+        <h3 style="color:#ff0055;">Painel de Banimento</h3>
+        <div id="admin-users-list" style="max-height: 250px; overflow-y: auto;"></div>
+        <button class="btn-fechar" style="margin-top: 15px; width: 100%;">Voltar</button>
     </div>
 
     <div class="overlay" id="overlay"></div>
@@ -140,40 +156,18 @@
         let currentUser = "";
         let postImageData = "";
 
-        // Funções de Tempo e Presença
-        function calcularTempo(ms) {
-            const diff = new Date().getTime() - ms;
-            const s = Math.floor(diff/1000), m = Math.floor(s/60), h = Math.floor(m/60);
-            if (s < 60) return "agora"; if (m < 60) return `há ${m}m`; if (h < 24) return `há ${h}h`;
-            return new Date(ms).toLocaleDateString();
-        }
-
-        // Login e Sessão
+        // LOGIN E SESSÃO
         async function fazerLogin() {
             const user = document.getElementById('login-user').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
             if(!user || !pass) return;
             const snap = await get(child(ref(db), `usuarios/${user}`));
-            if (snap.exists() && snap.val().senha === pass) {
-                localStorage.setItem('loggedUser', user);
-                abrirSessao(user);
-            } else {
-                document.getElementById('msg-erro').innerText = "Usuário ou senha incorretos.";
-            }
-        }
-
-        async function criarConta() {
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
-            if (!user || !pass) return;
-            const snap = await get(child(ref(db), `usuarios/${user}`));
             if (snap.exists()) {
-                document.getElementById('msg-erro').innerText = "Usuário já existe.";
-            } else {
-                await set(ref(db, `usuarios/${user}`), { senha: pass, bio: "", avatar: "", bg: "", sobre: [], status: "offline" });
-                document.getElementById('msg-erro').style.color = "#00ff88";
-                document.getElementById('msg-erro').innerText = "Conta criada! Pode entrar.";
-            }
+                const data = snap.val();
+                if(data.banido) { alert("Esta conta está banida."); return; }
+                if(data.senha === pass) { localStorage.setItem('loggedUser', user); abrirSessao(user); }
+                else { alert("Senha incorreta."); }
+            } else { alert("Usuário não existe."); }
         }
 
         function abrirSessao(user) {
@@ -182,107 +176,143 @@
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('modal-name').innerText = user;
 
-            // Status Online
             const statusRef = ref(db, `usuarios/${user}/status`);
             set(statusRef, "online");
             onDisconnect(statusRef).set("offline");
 
-            // Carregar Dados
+            // Monitorar banimento em tempo real
+            onValue(ref(db, `usuarios/${user}/banido`), (snap) => {
+                if(snap.val() === true) { alert("Você foi banido."); localStorage.clear(); location.reload(); }
+            });
+
+            // Carregar dados do perfil
             onValue(ref(db, `usuarios/${user}`), (snap) => {
                 const d = snap.val(); if(!d) return;
                 document.getElementById('bio-input').value = d.bio || "";
-                if (d.avatar) {
+                if(d.avatar) {
                     document.getElementById('main-avatar').src = d.avatar;
                     document.getElementById('main-avatar').style.display = 'block';
                     document.getElementById('main-icon').style.display = 'none';
                     document.getElementById('modal-avatar-img').src = d.avatar;
                 }
-                if (d.bg) document.body.style.backgroundImage = `url('${d.bg}')`;
+                if(d.bg) document.body.style.backgroundImage = `url('${d.bg}')`;
+                recarregarSobre(d.sobre);
             });
 
-            // Carregar Posts
             onValue(ref(db, 'posts'), (s) => recarregarFeed(s.val()));
         }
 
-        // Feed e Postagem
+        // FEED
         function recarregarFeed(posts) {
             const f = document.getElementById('feed'); f.innerHTML = ""; if(!posts) return;
             Object.values(posts).reverse().forEach(p => {
                 const card = document.createElement('div'); card.className = 'post-card';
-                const del = p.autor === currentUser ? `<button class="delete-btn" onclick="window.apagarPost('${p.id}')">🗑️</button>` : "";
                 const imgTag = p.imagem ? `<img src="${p.imagem}" class="post-image">` : "";
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <strong style="cursor:pointer; color:#00ff88;" onclick="window.abrirPerfilAlheio('${p.autor}')">${p.autor}</strong>
-                        <div><span style="font-size:10px; color:#888">${calcularTempo(p.dataMs)}</span> ${del}</div>
-                    </div>
-                    <div style="margin-top:8px">${p.texto}</div>
-                    ${imgTag}`;
+                card.innerHTML = `<strong style="cursor:pointer;color:#00ff88" onclick="window.abrirPerfilAlheio('${p.autor}')">${p.autor}</strong>
+                                 <div style="margin-top:8px">${p.texto}</div>${imgTag}`;
                 f.appendChild(card);
             });
         }
 
-        window.apagarPost = (id) => remove(ref(db, `posts/${id}`));
-
-        document.getElementById('post-image-input').onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-                postImageData = reader.result;
-                document.getElementById('post-preview').src = postImageData;
-                document.getElementById('post-preview').style.display = "block";
-            };
-            reader.readAsDataURL(e.target.files[0]);
+        // ADMIN LOGIC
+        document.getElementById('btn-admin-panel').onclick = () => { document.getElementById('admin-auth-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
+        document.getElementById('btn-acessar-admin').onclick = () => {
+            if(document.getElementById('admin-pass-input').value === "12345678900987654321") {
+                document.getElementById('admin-auth-modal').style.display = 'none';
+                document.getElementById('admin-list-modal').style.display = 'block';
+                carregarListaAdmin();
+            } else { alert("Senha Errada"); }
         };
 
-        document.getElementById('btn-publicar').onclick = async () => {
-            const txt = document.getElementById('post-text').value.trim();
-            if (!txt && !postImageData) return;
-            const postRef = push(ref(db, 'posts'));
-            await set(postRef, { texto: txt, imagem: postImageData, autor: currentUser, dataMs: new Date().getTime(), id: postRef.key });
-            document.getElementById('post-text').value = "";
-            document.getElementById('post-preview').style.display = "none";
-            postImageData = "";
+        function carregarListaAdmin() {
+            onValue(ref(db, 'usuarios'), (snap) => {
+                const list = document.getElementById('admin-users-list'); list.innerHTML = "";
+                const data = snap.val();
+                for (let name in data) {
+                    const div = document.createElement('div');
+                    div.style.display = "flex"; div.style.justifyContent = "space-between"; div.style.padding = "10px";
+                    div.innerHTML = `<span>${name}</span> <button style="background:red;font-size:10px" onclick="window.banir('${name}')">BAN</button>`;
+                    list.appendChild(div);
+                }
+            });
+        }
+
+        window.banir = async (u) => {
+            if(!confirm(`Banir ${u}?`)) return;
+            await update(ref(db, `usuarios/${u}`), { banido: true });
+            const pSnap = await get(ref(db, 'posts'));
+            const posts = pSnap.val();
+            for(let id in posts) { if(posts[id].autor === u) await remove(ref(db, `posts/${id}`)); }
         };
 
-        // Perfil Alheio
-        window.abrirPerfilAlheio = async (userName) => {
-            const snap = await get(child(ref(db), `usuarios/${userName}`));
-            const u = snap.val(); if(!u) return;
-            document.getElementById('view-modal-name').innerText = userName;
-            document.getElementById('view-bio-text').innerText = u.bio || "Sem bio.";
-            document.getElementById('view-avatar-img').src = u.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        // PROFILE LOGIC
+        window.abrirPerfilAlheio = async (u) => {
+            const snap = await get(child(ref(db), `usuarios/${u}`));
+            const data = snap.val();
+            document.getElementById('view-modal-name').innerText = u;
+            document.getElementById('view-bio-text').innerText = data.bio || "Sem bio.";
+            document.getElementById('view-avatar-img').src = data.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
             document.getElementById('view-profile-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
         };
 
-        // Membros
+        function recarregarSobre(itens) {
+            const l = document.getElementById('about-list'); l.innerHTML = ""; if(!itens) return;
+            itens.forEach(i => { l.innerHTML += `<div class="about-item"><b>${i.titulo}</b>${i.desc}</div>`; });
+        }
+
+        // EVENTOS
+        document.getElementById('btn-entrar').onclick = fazerLogin;
+        document.getElementById('btn-criar').onclick = async () => {
+            const user = document.getElementById('login-user').value.trim().toLowerCase();
+            const pass = document.getElementById('login-pass').value.trim();
+            if(!user || !pass) return;
+            await set(ref(db, `usuarios/${user}`), { senha: pass, banido: false, sobre: [], bio: "", avatar: "" });
+            alert("Criado!");
+        };
+
+        document.getElementById('btn-publicar').onclick = async () => {
+            const txt = document.getElementById('post-text').value.trim();
+            if(!txt && !postImageData) return;
+            const pRef = push(ref(db, 'posts'));
+            await set(pRef, { texto: txt, imagem: postImageData, autor: currentUser, dataMs: new Date().getTime(), id: pRef.key });
+            document.getElementById('post-preview').style.display = "none"; postImageData = ""; document.getElementById('post-text').value = "";
+        };
+
+        document.getElementById('post-image-input').onchange = (e) => {
+            const r = new FileReader(); r.onload = () => { postImageData = r.result; document.getElementById('post-preview').src = r.result; document.getElementById('post-preview').style.display = "block"; }; r.readAsDataURL(e.target.files[0]);
+        };
+
         document.getElementById('btn-usuarios').onclick = () => {
-            document.getElementById('users-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('users-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block';
             onValue(ref(db, 'usuarios'), (snap) => {
                 const list = document.getElementById('users-list-modal'); list.innerHTML = "";
                 const users = snap.val();
-                for (let name in users) {
-                    const status = users[name].status === 'online' ? 'online' : 'offline';
-                    const div = document.createElement('div');
-                    div.className = 'user-item';
-                    div.innerHTML = `<div class="status-dot ${status}"></div><strong>${name}</strong>`;
-                    div.onclick = () => window.abrirPerfilAlheio(name);
-                    list.appendChild(div);
+                for(let n in users) {
+                    const dot = users[n].status === 'online' ? 'online' : 'offline';
+                    list.innerHTML += `<div class="user-item" onclick="window.abrirPerfilAlheio('${n}')"><div class="status-dot ${dot}"></div>${n}</div>`;
                 }
             });
         };
 
-        // Eventos Gerais
-        document.getElementById('btn-entrar').onclick = fazerLogin;
-        document.getElementById('btn-criar').onclick = criarConta;
-        document.getElementById('btn-logout').onclick = () => { localStorage.clear(); location.reload(); };
-        document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
-        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; });
         document.getElementById('open-profile-btn').onclick = () => { document.getElementById('profile-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
+        document.getElementById('open-about-btn').onclick = () => { document.getElementById('about-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
+        document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = (s.style.display==='block'?'none':'block'); };
+        document.getElementById('btn-logout').onclick = () => { localStorage.clear(); location.reload(); };
+        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; });
+
         document.getElementById('profile-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
         document.getElementById('bg-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
         document.getElementById('bio-input').onblur = async () => await update(ref(db, `usuarios/${currentUser}`), {bio: document.getElementById('bio-input').value});
+        
+        document.getElementById('btn-add-about').onclick = async () => {
+            const t = document.getElementById('about-title').value, d = document.getElementById('about-desc').value;
+            if(!t || !d) return;
+            const s = await get(child(ref(db), `usuarios/${currentUser}/sobre`)); let sobre = s.val() || [];
+            sobre.push({titulo:t, desc:d});
+            await update(ref(db, `usuarios/${currentUser}`), {sobre: sobre});
+            document.getElementById('about-title').value = ""; document.getElementById('about-desc').value = "";
+        };
 
         const logged = localStorage.getItem('loggedUser');
         if(logged) abrirSessao(logged);
