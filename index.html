@@ -3,107 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localnet Cloud - Final Fix</title>
+    <title>Localnet Cloud - Global Chat</title>
     <style>
-        /* Base e Fundo */
-        html, body {
-            height: 100%; margin: 0; padding: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background-color: #121212; color: white; overflow: hidden;
-        }
-
-        body {
-            background-size: cover; background-position: center;
-            transition: background 0.5s ease;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        /* TELA DE LOGIN */
-        #login-screen {
-            background-color: #1e1e1e; padding: 40px; border-radius: 15px;
-            text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 320px; z-index: 100;
-        }
-
-        input, textarea {
-            display: block; width: 90%; margin: 15px auto; padding: 12px;
-            border-radius: 8px; border: 1px solid #333; background-color: #2a2a2a; color: white; outline: none;
-        }
-
-        button {
-            padding: 12px 20px; cursor: pointer; background-color: #ffffff;
-            border: none; border-radius: 8px; font-weight: bold;
-            transition: filter 0.3s ease;
-        }
-
-        button:hover { filter: brightness(0.8); }
-
-        /* PÁGINA PRINCIPAL */
-        #main-page { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-
-        .upload-box {
-            border: 2px solid white; border-radius: 12px;
-            display: flex; justify-content: center; align-items: center;
-            cursor: pointer; background-color: rgba(30, 30, 30, 0.8);
-            position: absolute; transition: all 0.3s ease; overflow: hidden;
-        }
+        /* BASE E ESTILO GERAL */
+        html, body { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; overflow: hidden; }
+        body { background-size: cover; background-position: center; transition: background 0.5s ease; display: flex; justify-content: center; align-items: center; }
         
+        /* LOGIN */
+        #login-screen { background-color: #1e1e1e; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 320px; z-index: 100; }
+        input, textarea { display: block; width: 90%; margin: 15px auto; padding: 12px; border-radius: 8px; border: 1px solid #333; background-color: #2a2a2a; color: white; outline: none; }
+        button { padding: 12px 20px; cursor: pointer; background-color: #ffffff; border: none; border-radius: 8px; font-weight: bold; transition: filter 0.3s ease; }
+        
+        /* MAIN PAGE */
+        #main-page { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
+        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(30, 30, 30, 0.8); position: absolute; transition: all 0.3s ease; overflow: hidden; }
         .profile-trigger { width: 70px; height: 70px; top: 20px; left: 20px; }
         .bg-upload { width: 45px; height: 45px; top: 105px; left: 20px; }
         .logout-btn { width: 45px; height: 45px; top: 165px; left: 20px; border-color: #ff4444; color: #ff4444; }
         .about-me-btn { width: 45px; height: 45px; top: 20px; right: 20px; border-color: #ffcc00; color: #ffcc00; }
         #btn-usuarios { width: 45px; height: 45px; top: 20px; right: 80px; border-color: #00ff88; color: #00ff88; font-size: 20px; }
-
+        
         /* MODAIS */
-        .modal {
-            display: none; position: fixed; top: 50%; left: 50%;
-            transform: translate(-50%, -50%); background: #1e1e1e;
-            padding: 30px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.9);
-            z-index: 200; width: 320px; border: 1px solid #444; text-align: center;
-        }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 25px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.9); z-index: 200; width: 320px; border: 1px solid #444; text-align: center; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 150; }
 
-        /* SOBRE MIM - ESTILO DOS QUADRADOS */
-        #about-list {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-            margin-top: 20px; max-height: 200px; overflow-y: auto; padding: 5px;
-        }
-
-        .about-item {
-            background: #2a2a2a; padding: 10px; border-radius: 8px;
-            font-size: 11px; text-align: left; border: 1px solid #444; 
-            min-height: 40px; position: relative;
-        }
-        .about-item:hover .item-actions { display: flex; }
-        .item-actions {
-            position: absolute; top: 5px; right: 5px; display: none; gap: 4px;
-        }
-        .action-btn {
-            background: rgba(0,0,0,0.6); border: none; color: white;
-            font-size: 10px; padding: 2px 4px; border-radius: 4px; cursor: pointer;
-        }
+        /* BIO E GRID */
+        .view-bio-container { background: #2a2a2a; padding: 15px; border-radius: 10px; margin-top: 15px; text-align: left; border-left: 3px solid #00ff88; font-size: 13px; color: #eee; }
+        #about-list, #view-about-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; max-height: 200px; overflow-y: auto; padding: 5px; }
+        .about-item { background: #2a2a2a; padding: 10px; border-radius: 8px; font-size: 11px; text-align: left; border: 1px solid #444; position: relative; }
         .about-item b { color: #ffcc00; display: block; margin-bottom: 2px; text-transform: uppercase; font-size: 9px; }
+        .item-actions { position: absolute; top: 5px; right: 5px; display: none; gap: 4px; }
+        .about-item:hover .item-actions { display: flex; }
+        .action-btn { background: rgba(0,0,0,0.6); border: none; color: white; font-size: 10px; padding: 2px 4px; border-radius: 4px; cursor: pointer; }
 
-        /* LISTA DE USUÁRIOS */
-        #users-list-modal { max-height: 250px; overflow-y: auto; text-align: left; margin-top: 15px; }
-        .user-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #333; }
+        /* LISTA USUÁRIOS */
+        .user-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; }
         .status-dot { width: 10px; height: 10px; border-radius: 50%; }
         .online { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
         .offline { background-color: #555; }
 
-        /* FEED */
-        #posts-section {
-            display: none; width: 90%; max-width: 450px; margin: 90px auto;
-            background: rgba(20, 20, 20, 0.9); border-radius: 15px; padding: 20px;
-            border: 1px solid #333; max-height: 75vh; overflow-y: auto; backdrop-filter: blur(10px);
-        }
+        /* FEED / CHAT */
+        #posts-section, #view-posts-modal-box { display: none; width: 90%; max-width: 450px; margin: 90px auto; background: rgba(20, 20, 20, 0.9); border-radius: 15px; padding: 20px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; backdrop-filter: blur(10px); }
+        .post-card { background: #252525; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #fff; }
+        .delete-btn { background: none; color: #ff4444; border: none; cursor: pointer; font-size: 14px; }
 
-        .post-card { 
-            background: #252525; padding: 15px; border-radius: 10px; 
-            margin-top: 15px; border-left: 4px solid #fff; position: relative;
+        /* CORREÇÃO DO BUG: ESCONDER INPUTS DE ARQUIVO */
+        input[type="file"] {
+            display: none !important;
+            visibility: hidden;
+            position: absolute;
+            left: -9999px;
         }
-
-        .delete-btn { background: none; color: #ff4444; border: none; padding: 5px; cursor: pointer; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 150; }
-        input[type="file"] { display: none; }
     </style>
 </head>
 <body>
@@ -121,7 +71,7 @@
 
     <div id="main-page">
         <div style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: center;">
-            <button id="btn-toggle-posts">POSTS</button>
+            <button id="btn-toggle-posts">CHATS / POSTS</button>
         </div>
 
         <div class="upload-box profile-trigger" id="open-profile-btn">
@@ -134,41 +84,61 @@
         <div class="upload-box" id="btn-usuarios"><span>🌐</span></div>
 
         <div id="posts-section">
-            <textarea id="post-text" placeholder="No que você está pensando?" style="height: 80px;"></textarea>
-            <button id="btn-publicar" style="width: 100%">Publicar</button>
+            <textarea id="post-text" placeholder="Escreva algo para o grupo..." style="height: 60px;"></textarea>
+            <button id="btn-publicar" style="width: 100%">Enviar Mensagem</button>
             <div id="feed"></div>
         </div>
     </div>
 
-    <div class="overlay" id="overlay"></div>
+    <div id="view-profile-modal" class="modal">
+        <img id="view-avatar-img" style="width:100px; height:100px; border-radius:50%; border:3px solid #00ff88; object-fit:cover; margin-bottom: 10px;">
+        <h2 id="view-modal-name" style="margin:0; color:#00ff88;">Nome</h2>
+        <div class="view-bio-container">
+            <b style="font-size: 10px; color: #00ff88; display: block; margin-bottom: 5px;">BIO</b>
+            <span id="view-bio-text">Carregando bio...</span>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button id="btn-view-posts" style="flex:1; font-size: 11px; background: #333; color: white;">MURAL</button>
+            <button id="btn-view-about" style="flex:1; font-size: 11px; background: #ffcc00; color: black;">SOBRE</button>
+        </div>
+        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #444; color: white;">Fechar</button>
+    </div>
+
+    <div id="view-posts-modal-box" class="modal" style="width: 380px; max-height: 80vh; overflow-y: auto;">
+        <h3 id="view-posts-title" style="margin-top:0;">Mural de Posts</h3>
+        <div id="view-feed"></div>
+        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Voltar</button>
+    </div>
+
+    <div id="view-about-modal" class="modal" style="width: 340px;">
+        <h3 id="view-about-title-name" style="color:#ffcc00;">Sobre o Usuário</h3>
+        <div id="view-about-list"></div>
+        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Voltar</button>
+    </div>
 
     <div id="users-modal" class="modal">
-        <h3 style="color:#00ff88; margin-top:0;">Membros da Rede</h3>
+        <h3 style="color:#00ff88; margin-top:0;">Membros Online</h3>
         <div id="users-list-modal"></div>
-        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
+        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #333; color: white;">Fechar</button>
     </div>
 
     <div id="profile-modal" class="modal">
-        <div style="display: flex; align-items: center; gap: 15px; text-align: left;">
-            <img id="modal-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid white; object-fit:cover;" onclick="document.getElementById('profile-input').click()">
-            <div>
-                <h2 id="modal-name" style="margin:0">Nome</h2>
-                <textarea id="bio-input" placeholder="Sua bio..." style="width: 150px; height: 50px; font-size: 11px; margin:0"></textarea>
-            </div>
-        </div>
-        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
+        <img id="modal-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid white; object-fit:cover;" onclick="document.getElementById('profile-input').click()">
+        <h2 id="modal-name">Meu Perfil</h2>
+        <textarea id="bio-input" placeholder="Escreva sua bio aqui..." style="height: 60px;"></textarea>
+        <button class="btn-fechar" style="width: 100%; background: #333; color: white;">Salvar e Fechar</button>
     </div>
 
     <div id="about-modal" class="modal" style="width: 340px;">
-        <h3 style="margin-top:0; color:#ffcc00;">Sobre Mim</h3>
-        <div style="display: flex; gap: 5px;">
-            <input type="text" id="about-title" placeholder="Título" style="margin:0; font-size: 12px; flex:1">
-            <input type="text" id="about-desc" placeholder="Resposta" style="margin:0; font-size: 12px; flex:1">
-        </div>
-        <button id="btn-add-about" style="width: 100%; margin-top: 10px; background: #ffcc00; color: #000; font-size: 12px;">ADICIONAR ITEM</button>
+        <h3 style="color:#ffcc00;">Meu Sobre Mim</h3>
+        <input type="text" id="about-title" placeholder="Título (Ex: Idade)">
+        <input type="text" id="about-desc" placeholder="Resposta">
+        <button id="btn-add-about" style="width: 100%; background: #ffcc00; color: black;">ADICIONAR</button>
         <div id="about-list"></div>
-        <button class="btn-fechar" style="margin-top: 20px; width: 100%; background: #333; color: white;">Fechar</button>
+        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #333; color: white;">Fechar</button>
     </div>
+
+    <div class="overlay" id="overlay"></div>
 
     <input type="file" id="profile-input" accept="image/*">
     <input type="file" id="bg-input" accept="image/*">
@@ -190,58 +160,40 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
         let currentUser = "";
         let indexParaEditar = null;
 
-        function calcularTempo(dataPostMs) {
-            const agora = new Date().getTime();
-            const diferenca = agora - dataPostMs;
-            const segundos = Math.floor(diferenca / 1000);
-            const minutos = Math.floor(segundos / 60);
-            const horas = Math.floor(minutos / 60);
-            if (segundos < 60) return "agora mesmo";
-            if (minutos < 60) return `há ${minutos} min`;
-            if (horas < 24) return `há ${horas} h`;
-            return new Date(dataPostMs).toLocaleDateString('pt-BR');
+        function calcularTempo(ms) {
+            const diff = new Date().getTime() - ms;
+            const s = Math.floor(diff/1000), m = Math.floor(s/60), h = Math.floor(m/60);
+            if (s < 60) return "agora"; if (m < 60) return `há ${m}m`; if (h < 24) return `há ${h}h`;
+            return new Date(ms).toLocaleDateString();
         }
 
         function gerenciarPresenca(user) {
-            const myStatusRef = ref(db, `usuarios/${user}/status`);
-            const connectedRef = ref(db, '.info/connected');
-            onValue(connectedRef, (snap) => {
-                if (snap.val() === true) {
-                    onDisconnect(myStatusRef).set('offline');
-                    set(myStatusRef, 'online');
-                }
+            const statusRef = ref(db, `usuarios/${user}/status`);
+            onValue(ref(db, '.info/connected'), (snap) => {
+                if (snap.val()) { onDisconnect(statusRef).set('offline'); set(statusRef, 'online'); }
             });
         }
 
         async function fazerLogin() {
             const user = document.getElementById('login-user').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
-            const snapshot = await get(child(ref(db), `usuarios/${user}`));
-            if (snapshot.exists() && snapshot.val().senha === pass) {
-                localStorage.setItem('loggedUser', user);
-                abrirSessao(user);
-            } else {
-                document.getElementById('msg-erro').innerText = "Dados incorretos.";
-            }
+            const snap = await get(child(ref(db), `usuarios/${user}`));
+            if (snap.exists() && snap.val().senha === pass) { localStorage.setItem('loggedUser', user); abrirSessao(user); }
+            else { document.getElementById('msg-erro').innerText = "Erro no login."; }
         }
 
         async function criarConta() {
             const user = document.getElementById('login-user').value.trim().toLowerCase();
             const pass = document.getElementById('login-pass').value.trim();
             if (!user || !pass) return;
-            const snapshot = await get(child(ref(db), `usuarios/${user}`));
-            if (snapshot.exists()) {
-                document.getElementById('msg-erro').innerText = "Usuário já existe!";
-            } else {
-                await set(ref(db, `usuarios/${user}`), {
-                    senha: pass, bio: "", avatar: "", bg: "", sobre: [], status: "offline"
-                });
-                document.getElementById('msg-erro').style.color = "#4ade80";
-                document.getElementById('msg-erro').innerText = "Conta criada!";
+            const snap = await get(child(ref(db), `usuarios/${user}`));
+            if (snap.exists()) { document.getElementById('msg-erro').innerText = "Já existe."; }
+            else {
+                await set(ref(db, `usuarios/${user}`), { senha: pass, bio: "", avatar: "", bg: "", sobre: [], status: "offline" });
+                document.getElementById('msg-erro').innerText = "Criado! Entre agora.";
             }
         }
 
@@ -251,173 +203,116 @@
             document.getElementById('main-page').style.display = 'block';
             document.getElementById('modal-name').innerText = user;
             gerenciarPresenca(user);
-            onValue(ref(db, `usuarios/${user}`), (snapshot) => {
-                const dados = snapshot.val();
-                if(!dados) return;
-                document.getElementById('bio-input').value = dados.bio || "";
-                if (dados.avatar) {
-                    document.getElementById('main-avatar').src = dados.avatar;
-                    document.getElementById('main-avatar').style.display = 'block';
-                    document.getElementById('main-icon').style.display = 'none';
-                    document.getElementById('modal-avatar-img').src = dados.avatar;
-                }
-                if (dados.bg) document.body.style.backgroundImage = `url('${dados.bg}')`;
-                recarregarSobre(dados.sobre);
+            onValue(ref(db, `usuarios/${user}`), (snap) => {
+                const d = snap.val(); if(!d) return;
+                document.getElementById('bio-input').value = d.bio || "";
+                if (d.avatar) { document.getElementById('main-avatar').src = d.avatar; document.getElementById('main-avatar').style.display = 'block'; document.getElementById('main-icon').style.display = 'none'; document.getElementById('modal-avatar-img').src = d.avatar; }
+                if (d.bg) document.body.style.backgroundImage = `url('${d.bg}')`;
+                recarregarSobre(d.sobre);
             });
-            onValue(ref(db, 'posts'), (snapshot) => {
-                recarregarFeed(snapshot.val());
-            });
+            onValue(ref(db, 'posts'), (s) => recarregarFeed(s.val()));
         }
+
+        window.abrirPerfilAlheio = async (userName) => {
+            const snap = await get(child(ref(db), `usuarios/${userName}`));
+            const u = snap.val(); if(!u) return;
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.getElementById('view-profile-modal').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('view-modal-name').innerText = userName;
+            document.getElementById('view-bio-text').innerText = u.bio || "Este usuário ainda não escreveu uma bio.";
+            document.getElementById('view-avatar-img').src = u.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            
+            document.getElementById('btn-view-posts').onclick = () => {
+                document.getElementById('view-profile-modal').style.display = 'none';
+                document.getElementById('view-posts-modal-box').style.display = 'block';
+                get(ref(db, 'posts')).then(s => {
+                    const f = document.getElementById('view-feed'); f.innerHTML = "";
+                    Object.values(s.val() || {}).reverse().forEach(p => {
+                        if(p.autor === userName) f.innerHTML += `<div class="post-card" style="border-left-color:#00ff88;"><strong>${p.autor}</strong> <span>${calcularTempo(p.dataMs)}</span><br>${p.texto}</div>`;
+                    });
+                });
+            };
+            document.getElementById('btn-view-about').onclick = () => {
+                document.getElementById('view-profile-modal').style.display = 'none';
+                document.getElementById('view-about-modal').style.display = 'block';
+                const l = document.getElementById('view-about-list'); l.innerHTML = "";
+                (u.sobre || []).forEach(i => l.innerHTML += `<div class="about-item"><b>${i.titulo}</b> ${i.desc}</div>`);
+            };
+        };
 
         document.getElementById('btn-usuarios').onclick = () => {
             document.getElementById('users-modal').style.display = 'block';
             document.getElementById('overlay').style.display = 'block';
-            onValue(ref(db, 'usuarios'), (snapshot) => {
-                const users = snapshot.val();
-                const listDiv = document.getElementById('users-list-modal');
-                listDiv.innerHTML = "";
-                for (let name in users) {
-                    const u = users[name];
-                    const dotClass = u.status === 'online' ? 'online' : 'offline';
-                    listDiv.innerHTML += `
-                        <div class="user-item">
-                            <div class="status-dot ${dotClass}"></div>
-                            <div style="flex:1">
-                                <strong style="font-size:14px;">${name}</strong>
-                                <div style="font-size:10px; color:#888;">${u.status === 'online' ? 'Disponível' : 'Offline'}</div>
-                            </div>
-                        </div>`;
+            onValue(ref(db, 'usuarios'), (snap) => {
+                const list = document.getElementById('users-list-modal'); list.innerHTML = "";
+                const data = snap.val();
+                for (let name in data) {
+                    const dot = data[name].status === 'online' ? 'online' : 'offline';
+                    const item = document.createElement('div');
+                    item.className = 'user-item';
+                    item.innerHTML = `<div class="status-dot ${dot}"></div><strong>${name}</strong>`;
+                    item.onclick = () => abrirPerfilAlheio(name);
+                    list.appendChild(item);
                 }
             });
         };
 
-        function publicarPost() {
-            const text = document.getElementById('post-text').value.trim();
-            if (!text) return;
-            const newPostRef = push(ref(db, 'posts'));
-            set(newPostRef, { texto: text, autor: currentUser, dataMs: new Date().getTime(), id: newPostRef.key });
-            document.getElementById('post-text').value = "";
+        function recarregarFeed(posts) {
+            const f = document.getElementById('feed'); f.innerHTML = ""; if(!posts) return;
+            Object.values(posts).reverse().forEach(p => {
+                const card = document.createElement('div'); card.className = 'post-card';
+                const del = p.autor === currentUser ? `<button class="delete-btn" data-id="${p.id}">🗑️</button>` : "";
+                card.innerHTML = `<div style="display:flex; justify-content:space-between">
+                    <strong style="cursor:pointer" onclick="abrirPerfilAlheio('${p.autor}')">${p.autor}</strong>
+                    <div><span style="font-size:10px; color:#888">${calcularTempo(p.dataMs)}</span> ${del}</div>
+                </div><div style="margin-top:8px">${p.texto}</div>`;
+                f.appendChild(card);
+            });
+            document.querySelectorAll('.delete-btn').forEach(b => b.onclick = () => remove(ref(db, `posts/${b.dataset.id}`)));
         }
 
-        function recarregarFeed(postsObj) {
-            const feed = document.getElementById('feed');
-            feed.innerHTML = "";
-            if (!postsObj) return;
-            Object.values(postsObj).reverse().forEach(p => {
-                const post = document.createElement('div');
-                post.className = 'post-card';
-                const tempo = calcularTempo(p.dataMs);
-                const delBtn = p.autor === currentUser ? `<button class="delete-btn" data-id="${p.id}">🗑️</button>` : "";
-                post.innerHTML = `
-                    <div style="display:flex; justify-content: space-between; align-items: center;">
-                        <div><strong>${p.autor}</strong> <span style="font-size:10px; color:#888;">${tempo}</span></div>
-                        ${delBtn}
-                    </div>
-                    <div style="margin-top:10px; color:#ddd;">${p.texto}</div>`;
-                feed.appendChild(post);
-            });
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.onclick = () => remove(ref(db, `posts/${btn.getAttribute('data-id')}`));
-            });
-        }
-
-        // --- SOBRE MIM: ADICIONAR / EDITAR / APAGAR ---
         async function salvarSobre() {
-            const t = document.getElementById('about-title').value.trim();
-            const d = document.getElementById('about-desc').value.trim();
-            if (!t || !d) return;
-
-            const snapshot = await get(child(ref(db), `usuarios/${currentUser}/sobre`));
-            let sobre = snapshot.val() || [];
-
-            if (indexParaEditar !== null) {
-                sobre[indexParaEditar] = { titulo: t, desc: d };
-                indexParaEditar = null;
-                document.getElementById('btn-add-about').innerText = "ADICIONAR ITEM";
-            } else {
-                sobre.push({ titulo: t, desc: d });
-            }
-
-            await update(ref(db, `usuarios/${currentUser}`), { sobre: sobre });
-            document.getElementById('about-title').value = "";
-            document.getElementById('about-desc').value = "";
+            const t = document.getElementById('about-title').value, d = document.getElementById('about-desc').value;
+            if(!t || !d) return;
+            const s = await get(child(ref(db), `usuarios/${currentUser}/sobre`)); let sobre = s.val() || [];
+            if(indexParaEditar !== null) { sobre[indexParaEditar] = {titulo:t, desc:d}; indexParaEditar = null; }
+            else { sobre.push({titulo:t, desc:d}); }
+            await update(ref(db, `usuarios/${currentUser}`), {sobre: sobre});
+            document.getElementById('about-title').value = ""; document.getElementById('about-desc').value = "";
         }
 
         function recarregarSobre(itens) {
-            const list = document.getElementById('about-list');
-            list.innerHTML = "";
-            if (!itens) return;
-            itens.forEach((item, index) => {
-                const div = document.createElement('div');
-                div.className = 'about-item';
-                div.innerHTML = `
-                    <div class="item-actions">
-                        <button class="action-btn" onclick="window.editarItem(${index})">✏️</button>
-                        <button class="action-btn" onclick="window.apagarItem(${index})">🗑️</button>
-                    </div>
-                    <b>${item.titulo}</b> ${item.desc}`;
-                list.appendChild(div);
+            const l = document.getElementById('about-list'); l.innerHTML = ""; if(!itens) return;
+            itens.forEach((i, idx) => {
+                const d = document.createElement('div'); d.className = 'about-item';
+                d.innerHTML = `<div class="item-actions"><button class="action-btn" onclick="window.ed(${idx})">✏️</button><button class="action-btn" onclick="window.ap(${idx})">🗑️</button></div><b>${i.titulo}</b> ${i.desc}`;
+                l.appendChild(d);
             });
         }
 
-        // Funções globais para os botões do Sobre Mim funcionarem
-        window.apagarItem = async (index) => {
-            const snapshot = await get(child(ref(db), `usuarios/${currentUser}/sobre`));
-            let sobre = snapshot.val() || [];
-            sobre.splice(index, 1);
-            await update(ref(db, `usuarios/${currentUser}`), { sobre: sobre });
-        };
+        window.ap = async (i) => { const s = await get(child(ref(db), `usuarios/${currentUser}/sobre`)); let sobre = s.val() || []; sobre.splice(i, 1); await update(ref(db, `usuarios/${currentUser}`), {sobre: sobre}); };
+        window.ed = async (i) => { const s = await get(child(ref(db), `usuarios/${currentUser}/sobre`)); let sobre = s.val() || []; document.getElementById('about-title').value = sobre[i].titulo; document.getElementById('about-desc').value = sobre[i].desc; indexParaEditar = i; };
 
-        window.editarItem = async (index) => {
-            const snapshot = await get(child(ref(db), `usuarios/${currentUser}/sobre`));
-            let sobre = snapshot.val() || [];
-            document.getElementById('about-title').value = sobre[index].titulo;
-            document.getElementById('about-desc').value = sobre[index].desc;
-            indexParaEditar = index;
-            document.getElementById('btn-add-about').innerText = "SALVAR ALTERAÇÃO";
-        };
-
-        // EVENTOS
         document.getElementById('btn-entrar').onclick = fazerLogin;
         document.getElementById('btn-criar').onclick = criarConta;
-        document.getElementById('btn-logout').onclick = () => {
-            if(currentUser) set(ref(db, `usuarios/${currentUser}/status`), 'offline');
-            localStorage.removeItem('loggedUser'); location.reload();
+        document.getElementById('btn-logout').onclick = () => { if(currentUser) set(ref(db, `usuarios/${currentUser}/status`), 'offline'); localStorage.clear(); location.reload(); };
+        document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
+        document.getElementById('btn-publicar').onclick = () => {
+            const t = document.getElementById('post-text').value; if(!t) return;
+            const r = push(ref(db, 'posts')); set(r, {texto:t, autor:currentUser, dataMs:new Date().getTime(), id:r.key});
+            document.getElementById('post-text').value = "";
         };
-        document.getElementById('btn-toggle-posts').onclick = () => {
-            const s = document.getElementById('posts-section');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
-        };
-        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = () => {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-            document.getElementById('overlay').style.display = 'none';
-            indexParaEditar = null;
-            document.getElementById('btn-add-about').innerText = "ADICIONAR ITEM";
-        });
-        document.getElementById('open-profile-btn').onclick = () => {
-            document.getElementById('profile-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-        };
-        document.getElementById('open-about-btn').onclick = () => {
-            document.getElementById('about-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
-        };
-        document.getElementById('btn-publicar').onclick = publicarPost;
+        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; });
+        document.getElementById('open-profile-btn').onclick = () => { document.getElementById('profile-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
+        document.getElementById('open-about-btn').onclick = () => { document.getElementById('about-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
+        document.getElementById('profile-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('bg-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('bio-input').onblur = async () => await update(ref(db, `usuarios/${currentUser}`), {bio: document.getElementById('bio-input').value});
         document.getElementById('btn-add-about').onclick = salvarSobre;
 
-        document.getElementById('profile-input').onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = async () => await update(ref(db, `usuarios/${currentUser}`), { avatar: reader.result });
-            reader.readAsDataURL(e.target.files[0]);
-        };
-        document.getElementById('bg-input').onchange = (e) => {
-            const reader = new FileReader();
-            reader.onload = async () => await update(ref(db, `usuarios/${currentUser}`), { bg: reader.result });
-            reader.readAsDataURL(e.target.files[0]);
-        };
-
         const logged = localStorage.getItem('loggedUser');
-        if (logged) abrirSessao(logged);
+        if(logged) abrirSessao(logged);
     </script>
 </body>
 </html>
