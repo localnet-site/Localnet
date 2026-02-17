@@ -40,8 +40,14 @@
         .shop-content.active { display: block; }
         #snake-canvas { background: #000; display: block; margin: 10px auto; border: 2px solid #333; border-radius: 5px; }
         
-        .mobile-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 150px; margin: 10px auto; }
-        .m-btn { background: #444; color: white; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 18px; }
+        /* SETAS MOBILE FORMATO TECLADO */
+        .mobile-controls { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(2, 50px); gap: 5px; justify-content: center; margin-top: 15px; }
+        .m-btn { background: #333; color: white; border: 1px solid #555; border-radius: 8px; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #111; }
+        .m-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #111; }
+        #m-up { grid-column: 2; grid-row: 1; }
+        #m-left { grid-column: 1; grid-row: 2; }
+        #m-down { grid-column: 2; grid-row: 2; }
+        #m-right { grid-column: 3; grid-row: 2; }
 
         .shop-item { background:#2a2a2a; padding:12px; border-radius:10px; border:1px solid #444; margin-bottom: 10px; }
         
@@ -117,7 +123,7 @@
             <div style="font-size:14px; margin-bottom: 5px;">Pontos: <span id="snake-score" style="color:#00ff88; font-weight:bold;">0</span></div>
             <canvas id="snake-canvas" width="200" height="200"></canvas>
             <div class="mobile-controls">
-                <div style="grid-column: 2;"><button class="m-btn" id="m-up">▲</button></div>
+                <button class="m-btn" id="m-up">▲</button>
                 <button class="m-btn" id="m-left">◀</button>
                 <button class="m-btn" id="m-down">▼</button>
                 <button class="m-btn" id="m-right">▶</button>
