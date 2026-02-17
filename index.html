@@ -3,319 +3,411 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localnet Cloud - Full Version</title>
+    <title>Localnet Cloud - Full Edition</title>
     <style>
+        /* RESET E BASE */
         html, body { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; overflow: hidden; }
         body { background-size: cover; background-position: center; transition: background 0.5s ease; display: flex; justify-content: center; align-items: center; }
         
-        /* LOGIN */
-        #login-screen { background-color: #1e1e1e; padding: 40px; border-radius: 15px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 320px; z-index: 100; }
-        input, textarea { display: block; width: 90%; margin: 15px auto; padding: 12px; border-radius: 8px; border: 1px solid #333; background-color: #2a2a2a; color: white; outline: none; }
-        button { padding: 12px 20px; cursor: pointer; background-color: #ffffff; border: none; border-radius: 8px; font-weight: bold; transition: filter 0.3s ease; }
+        button, .upload-box, .m-btn { cursor: pointer; border: none; transition: 0.2s; }
+        button:hover { filter: brightness(0.8); }
         
-        /* MAIN PAGE */
-        #main-page { display: none; width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; }
-        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; cursor: pointer; background-color: rgba(30, 30, 30, 0.8); position: absolute; transition: all 0.3s ease; overflow: hidden; z-index: 10; }
+        /* CAMADAS (Z-INDEX) */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 500; }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 20px; border-radius: 20px; z-index: 1000; width: 320px; border: 1px solid #444; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        
+        /* UI PRINCIPAL */
+        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; background-color: rgba(30, 30, 30, 0.8); position: absolute; z-index: 100; }
         .profile-trigger { width: 70px; height: 70px; top: 20px; left: 20px; }
         .bg-upload { width: 45px; height: 45px; top: 105px; left: 20px; }
-        .logout-btn { width: 45px; height: 45px; top: 165px; left: 20px; border-color: #ff4444; color: #ff4444; }
-        .about-me-btn { width: 45px; height: 45px; top: 20px; right: 20px; border-color: #ffcc00; color: #ffcc00; }
-        #btn-usuarios { width: 45px; height: 45px; top: 20px; right: 80px; border-color: #00ff88; color: #00ff88; font-size: 20px; }
-        .admin-btn { width: 50px; height: 50px; bottom: 20px; right: 20px; border-color: #ff0055; color: #ff0055; font-size: 22px; }
-
-        /* MODAIS */
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 25px; border-radius: 20px; box-shadow: 0 0 50px rgba(0,0,0,0.9); z-index: 200; width: 320px; border: 1px solid #444; text-align: center; }
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 150; }
+        .logout-btn { width: 45px; height: 45px; top: 165px; left: 20px; border: 2px solid #ff4444; color: #ff4444; }
+        .central-btn { width: 45px; height: 45px; top: 20px; right: 20px; border: 2px solid #ffcc00; color: #ffcc00; font-size: 20px; }
+        .users-btn { width: 45px; height: 45px; top: 20px; right: 80px; border: 2px solid #00ff88; color: #00ff88; font-size: 20px; }
+        .admin-btn { width: 50px; height: 50px; bottom: 20px; right: 20px; border: 2px solid #ff0055; color: #ff0055; font-size: 22px; }
+        
+        #btn-toggle-posts { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); padding: 10px 25px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 20px; backdrop-filter: blur(5px); z-index: 150; font-weight: bold; }
 
         /* FEED E POSTS */
-        #posts-section { display: none; width: 90%; max-width: 450px; margin: 90px auto; background: rgba(20, 20, 20, 0.9); border-radius: 15px; padding: 20px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; backdrop-filter: blur(10px); }
-        .post-card { background: #252525; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 4px solid #fff; text-align: left; }
-        .post-image { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; margin-top: 10px; border: 1px solid #444; }
-        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 10px; display: none; margin: 10px auto; border: 2px solid #00ff88; }
-        
-        /* LISTAS (USUARIOS / SOBRE) */
-        .user-item, .admin-user-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-bottom: 1px solid #333; cursor: pointer; text-align: left; }
-        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
-        .online { background-color: #00ff88; box-shadow: 0 0 8px #00ff88; }
-        .offline { background-color: #555; }
-        #about-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; max-height: 150px; overflow-y: auto; }
-        .about-item { background: #2a2a2a; padding: 8px; border-radius: 8px; font-size: 11px; text-align: left; position: relative; }
-        .about-item b { color: #ffcc00; display: block; font-size: 9px; }
+        #posts-section { display: none; width: 90%; max-width: 380px; margin-top: 80px; background: rgba(20, 20, 20, 0.95); border-radius: 15px; padding: 15px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; z-index: 200; position: relative; }
+        .post-card { background: #252525; padding: 12px; border-radius: 10px; margin-top: 12px; border-left: 3px solid #00ff88; text-align: left; }
+        .post-image { width: 100%; border-radius: 10px; margin-top: 10px; }
 
+        /* LOJA E SNAKE */
+        .shop-nav { display: flex; border-bottom: 1px solid #444; margin-bottom: 15px; }
+        .shop-tab { flex: 1; padding: 10px; cursor: pointer; font-size: 12px; background: #222; }
+        .shop-tab.active { background: #333; border-bottom: 2px solid #ffcc00; }
+        .shop-content { display: none; }
+        .shop-content.active { display: block; }
+        #snake-canvas { background: #000; display: block; margin: 10px auto; border: 2px solid #333; border-radius: 5px; }
+        
+        .mobile-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; width: 150px; margin: 10px auto; }
+        .m-btn { background: #444; color: white; padding: 15px; border-radius: 10px; font-weight: bold; font-size: 18px; }
+
+        .shop-item { background:#2a2a2a; padding:12px; border-radius:10px; border:1px solid #444; margin-bottom: 10px; }
+        
+        /* RANKING DESIGN */
+        .rank-row { display: flex; justify-content: space-between; padding: 8px 12px; background: #252525; border-radius: 8px; margin-bottom: 5px; border: 1px solid #333; align-items: center; }
+        .rank-pos { font-weight: bold; color: #ffcc00; margin-right: 10px; }
+        .rank-pts { font-size: 12px; color: #00ff88; background: #1a3326; padding: 2px 8px; border-radius: 10px; }
+
+        input, textarea { width: 90%; margin: 10px auto; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: white; display: block; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .online { background-color: #00ff88; } .offline { background-color: #555; }
         input[type="file"] { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <h1>Localnet Cloud</h1>
+    <div id="login-screen" class="modal" style="display:block;">
+        <h2>Localnet</h2>
         <input type="text" id="login-user" placeholder="Usuário">
         <input type="password" id="login-pass" placeholder="Senha">
-        <div style="display:flex; gap:10px; justify-content: center;">
-            <button id="btn-entrar">ENTRAR</button>
-            <button id="btn-criar">CRIAR CONTA</button>
-        </div>
-        <p id="msg-erro" style="color: #ff6b6b; font-size: 13px; margin-top: 15px;"></p>
+        <button id="btn-entrar" style="background:white; color:black; padding: 12px; border-radius: 8px; width:100%; font-weight:bold;">Entrar / Criar</button>
     </div>
 
-    <div id="main-page">
-        <div style="position: absolute; top: 20px; width: 100%; display: flex; justify-content: center;">
-            <button id="btn-toggle-posts">CHATS / POSTS</button>
-        </div>
-
-        <div class="upload-box profile-trigger" id="open-profile-btn">
+    <div id="main-page" style="display:none;">
+        <button id="btn-toggle-posts">CHATS / POSTS</button>
+        
+        <div class="upload-box profile-trigger" id="btn-meu-perfil">
             <img id="main-avatar" style="width:100%; height:100%; object-fit:cover; display:none;">
             <span id="main-icon" style="font-size: 25px;">👤</span>
         </div>
-        <div class="upload-box bg-upload" onclick="document.getElementById('bg-input').click()"><span>🖼️</span></div>
-        <div class="upload-box logout-btn" id="btn-logout"><span>🚪</span></div>
-        <div class="upload-box about-me-btn" id="open-about-btn"><span>⭐</span></div>
-        <div class="upload-box" id="btn-usuarios"><span>🌐</span></div>
-        <div class="upload-box admin-btn" id="btn-admin-panel"><span>🛡️</span></div>
+        
+        <div class="upload-box bg-upload" id="btn-upload-bg"><span>🖼️</span></div>
+        <div class="upload-box logout-btn" id="btn-sair"><span>🚪</span></div>
+        <div class="upload-box central-btn" id="btn-abrir-central"><span>⭐</span></div>
+        <div class="upload-box users-btn" id="btn-lista-usuarios"><span>🌐</span></div>
+        <div class="upload-box admin-btn" id="btn-adm-acesso"><span>🛡️</span></div>
 
         <div id="posts-section">
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <textarea id="post-text" placeholder="No que está pensando?" style="height: 50px; flex: 1; margin: 0;"></textarea>
-                    <div style="background:#333; padding:10px; border-radius:8px; cursor:pointer;" onclick="document.getElementById('post-image-input').click()">📎</div>
-                </div>
-                <img id="post-preview" class="preview-img">
-                <button id="btn-publicar" style="width: 100%; background: #00ff88; color: black;">PUBLICAR</button>
+            <div style="display: flex; gap: 8px;">
+                <textarea id="post-text" placeholder="No que pensa?" style="height: 40px; margin:0; flex:1;"></textarea>
+                <button id="btn-add-foto" style="background:#333; color:white; padding:10px; border-radius:8px;">📎</button>
             </div>
+            <img id="post-preview" style="width: 100%; height: 150px; object-fit: cover; display: none; margin: 10px 0; border-radius: 10px;">
+            <button id="btn-publicar" style="background: #00ff88; color: black; width: 100%; font-weight: bold; padding: 12px; border-radius: 8px; margin-top:5px;">Postar</button>
             <div id="feed"></div>
         </div>
     </div>
 
-    <div id="profile-modal" class="modal">
-        <img id="modal-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid white; object-fit:cover;" onclick="document.getElementById('profile-input').click()">
-        <h2 id="modal-name">Meu Perfil</h2>
-        <textarea id="bio-input" placeholder="Sua bio..."></textarea>
-        <button class="btn-fechar" style="width: 100%; background: #00ff88; color: black;">Salvar e Sair</button>
+    <div id="central-modal" class="modal">
+        <h3>Central</h3>
+        <button id="nav-sobre" style="width:100%; padding:12px; margin-bottom:8px; background:#333; color:white; border-radius:8px;">⭐ Sobre Mim</button>
+        <button id="nav-loja" style="width:100%; padding:12px; background:#333; color:white; border-radius:8px;">🛒 Loja e Jogos</button>
+        <button class="btn-fechar-geral" style="margin-top:15px; width:100%; background:#ff4444; color:white; padding:10px; border-radius:8px;">Fechar</button>
     </div>
 
-    <div id="about-modal" class="modal" style="width: 340px;">
-        <h3 style="color:#ffcc00;">Meu Sobre Mim</h3>
-        <input type="text" id="about-title" placeholder="Título">
-        <input type="text" id="about-desc" placeholder="Resposta">
-        <button id="btn-add-about" style="width: 100%; background: #ffcc00; color: black;">ADICIONAR</button>
-        <div id="about-list"></div>
-        <button class="btn-fechar" style="margin-top: 10px; width: 100%;">Fechar</button>
-    </div>
-
-    <div id="view-profile-modal" class="modal">
-        <img id="view-avatar-img" style="width:100px; height:100px; border-radius:50%; border:3px solid #00ff88; object-fit:cover; margin-bottom: 10px;">
-        <h2 id="view-modal-name" style="color:#00ff88;"></h2>
-        <div style="background: #2a2a2a; padding: 10px; border-radius: 10px; text-align: left; font-size: 13px; border-left: 3px solid #00ff88;">
-            <b>BIO:</b> <span id="view-bio-text"></span>
+    <div id="shop-modal" class="modal" style="width: 340px;">
+        <div class="shop-nav">
+            <div class="shop-tab active" id="tab-btn-loja">Loja</div>
+            <div class="shop-tab" id="tab-btn-game">Snake</div>
+            <div class="shop-tab" id="tab-btn-rank">Ranking</div>
         </div>
-        <button class="btn-fechar" style="margin-top: 15px; width: 100%; background: #444;">Fechar</button>
+        
+        <div id="content-loja" class="shop-content active">
+            <p>Seus Pontos: <b id="saldo-display" style="color:#00ff88">0</b></p>
+            <div class="shop-item">👑 Verificado (30 pts)<div id="btn-compra-verificado"></div></div>
+            <div class="shop-item">🎨 Cor do Nome (50 pts)
+                <input type="color" id="color-picker" style="width:50px; height:30px; margin:5px auto; cursor:pointer;">
+                <div id="btn-compra-cor"></div>
+            </div>
+        </div>
+
+        <div id="content-game" class="shop-content">
+            <div style="font-size:14px; margin-bottom: 5px;">Pontos: <span id="snake-score" style="color:#00ff88; font-weight:bold;">0</span></div>
+            <canvas id="snake-canvas" width="200" height="200"></canvas>
+            <div class="mobile-controls">
+                <div style="grid-column: 2;"><button class="m-btn" id="m-up">▲</button></div>
+                <button class="m-btn" id="m-left">◀</button>
+                <button class="m-btn" id="m-down">▼</button>
+                <button class="m-btn" id="m-right">▶</button>
+            </div>
+        </div>
+
+        <div id="content-rank" class="shop-content">
+            <h4>Recordes Globais 🏆</h4>
+            <div id="ranking-list" style="max-height:220px; overflow-y:auto; padding: 5px;"></div>
+        </div>
+        <button class="btn-fechar-geral" style="margin-top:15px; width:100%; background:#333; color:white; padding:10px; border-radius:8px;">Sair</button>
+    </div>
+
+    <div id="view-profile-modal" class="modal" style="z-index: 2000;">
+        <img id="view-img" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #ffcc00;">
+        <h2 id="view-name"></h2>
+        <div id="view-bio" style="font-size:13px; background:#222; padding:10px; border-radius:8px; margin: 10px 0;"></div>
+        <div id="view-sobre-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"></div>
+        <button onclick="fecharModais()" style="margin-top:15px; width:100%; background:#444; color:white; padding:10px; border-radius: 8px;">Fechar</button>
     </div>
 
     <div id="users-modal" class="modal">
-        <h3 style="color:#00ff88;">Membros</h3>
-        <div id="users-list-modal" style="max-height: 200px; overflow-y: auto;"></div>
-        <button class="btn-fechar" style="margin-top: 10px; width: 100%;">Fechar</button>
+        <h3>Membros</h3>
+        <div id="lista-geral-usuarios" style="max-height: 250px; overflow-y: auto;"></div>
+        <button class="btn-fechar-geral" style="margin-top:10px; width:100%; background:#333; color:white; padding:10px; border-radius: 8px;">Fechar</button>
     </div>
 
-    <div id="admin-auth-modal" class="modal">
-        <h3>ADM Login</h3>
-        <input type="password" id="admin-pass-input" placeholder="Chave Mestre">
-        <button id="btn-acessar-admin" style="width: 100%; background: #ff0055; color: white;">ACESSAR</button>
-        <button class="btn-fechar" style="margin-top: 10px; width: 100%; background: #333;">Sair</button>
+    <div id="admin-modal" class="modal">
+        <h3>Acesso Mestre</h3>
+        <input type="password" id="pass-mestre" placeholder="Senha ADM">
+        <button id="btn-login-adm" style="background:#ff0055; color:white; width:100%; padding:10px; border-radius:8px;">Acessar</button>
+        <button class="btn-fechar-geral" style="margin-top:10px; background:transparent; color:gray;">Cancelar</button>
     </div>
 
-    <div id="admin-list-modal" class="modal" style="width: 350px;">
-        <h3 style="color:#ff0055;">Painel de Banimento</h3>
-        <div id="admin-users-list" style="max-height: 250px; overflow-y: auto;"></div>
-        <button class="btn-fechar" style="margin-top: 15px; width: 100%;">Voltar</button>
+    <div id="my-profile-modal" class="modal">
+        <img id="edit-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid #fff; object-fit:cover;" onclick="document.getElementById('file-avatar').click()">
+        <h3 id="edit-name-display"></h3>
+        <textarea id="edit-bio-input" placeholder="Sua bio..."></textarea>
+        <button class="btn-fechar-geral" style="background: #00ff88; color:black; width:100%; font-weight:bold; padding:10px; border-radius: 8px;">Salvar</button>
     </div>
 
-    <div class="overlay" id="overlay"></div>
+    <div id="about-modal" class="modal">
+        <h3>Personalizar Perfil</h3>
+        <input type="text" id="input-sobre-titulo" placeholder="Ex: Hobbie">
+        <input type="text" id="input-sobre-desc" placeholder="Ex: Jogar">
+        <button id="btn-salvar-sobre" style="background: #ffcc00; width:100%; padding:10px; font-weight:bold; border-radius:8px;">Adicionar</button>
+        <div id="meu-sobre-lista" style="max-height:120px; overflow-y:auto; margin-top:10px;"></div>
+        <button id="btn-voltar-central" style="margin-top:10px; width:100%; background:#333; color:white; padding:10px; border-radius:8px;">Voltar</button>
+    </div>
 
-    <input type="file" id="profile-input" accept="image/*">
-    <input type="file" id="bg-input" accept="image/*">
-    <input type="file" id="post-image-input" accept="image/*">
+    <div class="overlay" id="overlay-bg"></div>
+    <input type="file" id="file-avatar" accept="image/*">
+    <input type="file" id="file-bg" accept="image/*">
+    <input type="file" id="file-post" accept="image/*">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, get, child, remove, update, onDisconnect } 
-        from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, get, child, update, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAdfasR5Z2Cd7ETQ2p_RreRkYK2q5pdlXI",
-            authDomain: "localnet-45a7f.firebaseapp.com",
-            projectId: "localnet-45a7f",
-            storageBucket: "localnet-45a7f.firebasestorage.app",
-            messagingSenderId: "54266406528",
-            appId: "1:54266406528:web:5df0ac496ed214290f6865",
-            databaseURL: "https://localnet-45a7f-default-rtdb.firebaseio.com"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyAdfasR5Z2Cd7ETQ2p_RreRkYK2q5pdlXI", authDomain: "localnet-45a7f.firebaseapp.com", projectId: "localnet-45a7f", storageBucket: "localnet-45a7f.firebasestorage.app", messagingSenderId: "54266406528", appId: "1:54266406528:web:5df0ac496ed214290f6865", databaseURL: "https://localnet-45a7f-default-rtdb.firebaseio.com" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        let currentUser = "";
-        let postImageData = "";
+        
+        let userAtual = "", ptsRecorde = 0, verificado = false, imgPostBase64 = "";
 
-        // LOGIN E SESSÃO
-        async function fazerLogin() {
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
-            if(!user || !pass) return;
-            const snap = await get(child(ref(db), `usuarios/${user}`));
-            if (snap.exists()) {
-                const data = snap.val();
-                if(data.banido) { alert("Esta conta está banida."); return; }
-                if(data.senha === pass) { localStorage.setItem('loggedUser', user); abrirSessao(user); }
-                else { alert("Senha incorreta."); }
-            } else { alert("Usuário não existe."); }
-        }
+        // --- CONTROLE DE INTERFACE ---
+        window.fecharModais = () => {
+            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+            document.getElementById('overlay-bg').style.display = 'none';
+            stopSnake();
+        };
 
-        function abrirSessao(user) {
-            currentUser = user;
+        document.querySelectorAll('.btn-fechar-geral').forEach(btn => btn.addEventListener('click', fecharModais));
+
+        // --- LOGIN ---
+        document.getElementById('btn-entrar').onclick = async () => {
+            const u = document.getElementById('login-user').value.toLowerCase().trim();
+            const p = document.getElementById('login-pass').value;
+            if(!u || !p) return;
+            const snap = await get(child(ref(db), `usuarios/${u}`));
+            if(snap.exists() && snap.val().senha === p) logar(u);
+            else if(!snap.exists()) { await set(ref(db, `usuarios/${u}`), {senha:p, pontos:0, status:"online"}); logar(u); }
+            else alert("Dados incorretos!");
+        };
+
+        function logar(u) {
+            userAtual = u; localStorage.setItem('localnet_user', u);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
-            document.getElementById('modal-name').innerText = user;
+            
+            set(ref(db, `usuarios/${u}/status`), "online");
+            onDisconnect(ref(db, `usuarios/${u}/status`)).set("offline");
 
-            const statusRef = ref(db, `usuarios/${user}/status`);
-            set(statusRef, "online");
-            onDisconnect(statusRef).set("offline");
-
-            // Monitorar banimento em tempo real
-            onValue(ref(db, `usuarios/${user}/banido`), (snap) => {
-                if(snap.val() === true) { alert("Você foi banido."); localStorage.clear(); location.reload(); }
-            });
-
-            // Carregar dados do perfil
-            onValue(ref(db, `usuarios/${user}`), (snap) => {
+            onValue(ref(db, `usuarios/${u}`), (snap) => {
                 const d = snap.val(); if(!d) return;
-                document.getElementById('bio-input').value = d.bio || "";
-                if(d.avatar) {
-                    document.getElementById('main-avatar').src = d.avatar;
-                    document.getElementById('main-avatar').style.display = 'block';
-                    document.getElementById('main-icon').style.display = 'none';
-                    document.getElementById('modal-avatar-img').src = d.avatar;
-                }
+                ptsRecorde = d.pontos || 0; verificado = d.verificado || false;
+                document.getElementById('saldo-display').innerText = ptsRecorde;
+                document.getElementById('edit-name-display').innerText = u;
+                document.getElementById('edit-name-display').style.color = d.nomeCor || "white";
+                
+                const btnV = document.getElementById('btn-compra-verificado');
+                btnV.innerHTML = d.verificado ? `<b style="color:#ffcc00">ATIVO ✅</b>` : `<button id="buy-v" style="background:#ffcc00; padding:5px; border-radius:5px;">Comprar</button>`;
+                if(document.getElementById('buy-v')) document.getElementById('buy-v').onclick = () => comprar('verificado', 30);
+
+                const btnC = document.getElementById('btn-compra-cor');
+                btnC.innerHTML = d.hasCor ? `<button id="apply-c" style="background:#00ff88; padding:5px; border-radius:5px;">Salvar Cor</button>` : `<button id="buy-c" style="background:#ffcc00; padding:5px; border-radius:5px;">Comprar Acesso</button>`;
+                if(document.getElementById('buy-c')) document.getElementById('buy-c').onclick = () => comprar('hasCor', 50);
+                if(document.getElementById('apply-c')) document.getElementById('apply-c').onclick = async () => await update(ref(db, `usuarios/${userAtual}`), {nomeCor: document.getElementById('color-picker').value});
+
+                if(d.avatar) { document.getElementById('main-avatar').src = d.avatar; document.getElementById('main-avatar').style.display='block'; document.getElementById('main-icon').style.display='none'; document.getElementById('edit-avatar-img').src = d.avatar; }
                 if(d.bg) document.body.style.backgroundImage = `url('${d.bg}')`;
-                recarregarSobre(d.sobre);
+                if(d.bio) document.getElementById('edit-bio-input').value = d.bio;
+                renderSobre(d.sobre);
             });
 
-            onValue(ref(db, 'posts'), (s) => recarregarFeed(s.val()));
+            onValue(ref(db, 'usuarios'), (uSnap) => {
+                const todos = uSnap.val();
+                onValue(ref(db, 'posts'), (s) => renderFeed(s.val(), todos));
+                renderRank(todos);
+            });
         }
 
-        // FEED
-        function recarregarFeed(posts) {
+        async function comprar(campo, preco) {
+            if(ptsRecorde >= preco) {
+                let up = { pontos: ptsRecorde - preco }; up[campo] = true;
+                await update(ref(db, `usuarios/${userAtual}`), up);
+            } else alert("Pontos insuficientes!");
+        }
+
+        // --- BOTÕES PRINCIPAIS ---
+        document.getElementById('btn-meu-perfil').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('my-profile-modal').style.display='block'; };
+        document.getElementById('btn-upload-bg').onclick = () => document.getElementById('file-bg').click();
+        document.getElementById('btn-sair').onclick = () => { localStorage.clear(); location.reload(); };
+        document.getElementById('btn-abrir-central').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('central-modal').style.display='block'; };
+        document.getElementById('nav-sobre').onclick = () => { document.getElementById('central-modal').style.display='none'; document.getElementById('about-modal').style.display='block'; };
+        document.getElementById('nav-loja').onclick = () => { document.getElementById('central-modal').style.display='none'; document.getElementById('shop-modal').style.display='block'; window.switchTab('loja'); };
+        document.getElementById('btn-voltar-central').onclick = () => { document.getElementById('about-modal').style.display='none'; document.getElementById('central-modal').style.display='block'; };
+        document.getElementById('btn-adm-acesso').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('admin-modal').style.display='block'; };
+        document.getElementById('btn-lista-usuarios').onclick = () => {
+            document.getElementById('overlay-bg').style.display='block';
+            document.getElementById('users-modal').style.display='block';
+            onValue(ref(db, 'usuarios'), s => {
+                const l = document.getElementById('lista-geral-usuarios'); l.innerHTML = "";
+                for(let n in s.val()){
+                    const u = s.val()[n]; if(u.banido) continue;
+                    l.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; cursor:pointer;" onclick="verPerfilOutro('${n}')"><span class="status-dot ${u.status=='online'?'online':'offline'}"></span>${n}</div>`;
+                }
+            });
+        };
+
+        // --- SNAKE COM TECLADO INTEGRADO ---
+        const sCanvas = document.getElementById('snake-canvas'), sCtx = sCanvas.getContext('2d');
+        let snake, food, dir, gLoop, sScore; const box = 10;
+        
+        function startSnake() { stopSnake(); snake=[{x:100,y:100}]; dir="RIGHT"; sScore=0; document.getElementById('snake-score').innerText=0; spawnFood(); gLoop=setInterval(drawS, 100); }
+        function stopSnake() { clearInterval(gLoop); }
+        function spawnFood() { food={x:Math.floor(Math.random()*19)*box, y:Math.floor(Math.random()*19)*box}; }
+        
+        function drawS() {
+            sCtx.fillStyle="black"; sCtx.fillRect(0,0,200,200);
+            snake.forEach((p,i)=> { sCtx.fillStyle=i==0?"#00ff88":"white"; sCtx.fillRect(p.x,p.y,box,box); });
+            sCtx.fillStyle="red"; sCtx.fillRect(food.x,food.y,box,box);
+            let nX=snake[0].x, nY=snake[0].y;
+            if(dir=="LEFT") nX-=box; if(dir=="UP") nY-=box; if(dir=="RIGHT") nX+=box; if(dir=="DOWN") nY+=box;
+            if(nX==food.x && nY==food.y){ sScore++; document.getElementById('snake-score').innerText=sScore; spawnFood(); } else snake.pop();
+            let head={x:nX, y:nY};
+            if(nX<0||nX>=200||nY<0||nY>=200||snake.some(s=>s.x==head.x&&s.y==head.y)){
+                if(sScore > 0) { 
+                    update(ref(db, `usuarios/${userAtual}`), {pontos: ptsRecorde + sScore});
+                    alert("Você ganhou " + sScore + " pontos!");
+                }
+                startSnake(); return;
+            }
+            snake.unshift(head);
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const k = e.key;
+            if((k === "ArrowUp" || k === "w") && dir !== "DOWN") dir = "UP";
+            if((k === "ArrowDown" || k === "s") && dir !== "UP") dir = "DOWN";
+            if((k === "ArrowLeft" || k === "a") && dir !== "RIGHT") dir = "LEFT";
+            if((k === "ArrowRight" || k === "d") && dir !== "LEFT") dir = "RIGHT";
+        });
+
+        document.getElementById('m-up').onclick=()=> {if(dir!="DOWN")dir="UP"};
+        document.getElementById('m-down').onclick=()=> {if(dir!="UP")dir="DOWN"};
+        document.getElementById('m-left').onclick=()=> {if(dir!="RIGHT")dir="LEFT"};
+        document.getElementById('m-right').onclick=()=> {if(dir!="LEFT")dir="RIGHT"};
+
+        // --- POSTS ---
+        document.getElementById('btn-toggle-posts').onclick = () => {
+            const s = document.getElementById('posts-section');
+            s.style.display = s.style.display === 'block' ? 'none' : 'block';
+        };
+        document.getElementById('btn-add-foto').onclick = () => document.getElementById('file-post').click();
+        document.getElementById('file-post').onchange = (e) => {
+            const r = new FileReader(); r.onload = () => {
+                imgPostBase64 = r.result;
+                document.getElementById('post-preview').src = r.result;
+                document.getElementById('post-preview').style.display = "block";
+            }; r.readAsDataURL(e.target.files[0]);
+        };
+        document.getElementById('btn-publicar').onclick = async () => {
+            const t = document.getElementById('post-text').value.trim();
+            if(t || imgPostBase64) {
+                await set(push(ref(db, 'posts')), {texto: t, imagem: imgPostBase64, autor: userAtual});
+                document.getElementById('post-text').value = ""; document.getElementById('post-preview').style.display = "none"; imgPostBase64 = "";
+            }
+        };
+
+        function renderFeed(posts, todos) {
             const f = document.getElementById('feed'); f.innerHTML = ""; if(!posts) return;
-            Object.values(posts).reverse().forEach(p => {
+            Object.keys(posts).reverse().forEach(id => {
+                const p = posts[id]; const d = todos[p.autor];
+                if(d?.banido) return;
                 const card = document.createElement('div'); card.className = 'post-card';
-                const imgTag = p.imagem ? `<img src="${p.imagem}" class="post-image">` : "";
-                card.innerHTML = `<strong style="cursor:pointer;color:#00ff88" onclick="window.abrirPerfilAlheio('${p.autor}')">${p.autor}</strong>
-                                 <div style="margin-top:8px">${p.texto}</div>${imgTag}`;
+                card.innerHTML = `<b style="color:${d?.nomeCor || '#00ff88'}; cursor:pointer;" onclick="verPerfilOutro('${p.autor}')">${p.autor}${d?.verificado?' 👑':''}</b><p>${p.texto}</p>${p.imagem?`<img src="${p.imagem}" class="post-image">`:""}`;
                 f.appendChild(card);
             });
         }
 
-        // ADMIN LOGIC
-        document.getElementById('btn-admin-panel').onclick = () => { document.getElementById('admin-auth-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
-        document.getElementById('btn-acessar-admin').onclick = () => {
-            if(document.getElementById('admin-pass-input').value === "12345678900987654321") {
-                document.getElementById('admin-auth-modal').style.display = 'none';
-                document.getElementById('admin-list-modal').style.display = 'block';
-                carregarListaAdmin();
-            } else { alert("Senha Errada"); }
-        };
-
-        function carregarListaAdmin() {
-            onValue(ref(db, 'usuarios'), (snap) => {
-                const list = document.getElementById('admin-users-list'); list.innerHTML = "";
-                const data = snap.val();
-                for (let name in data) {
-                    const div = document.createElement('div');
-                    div.style.display = "flex"; div.style.justifyContent = "space-between"; div.style.padding = "10px";
-                    div.innerHTML = `<span>${name}</span> <button style="background:red;font-size:10px" onclick="window.banir('${name}')">BAN</button>`;
-                    list.appendChild(div);
-                }
-            });
-        }
-
-        window.banir = async (u) => {
-            if(!confirm(`Banir ${u}?`)) return;
-            await update(ref(db, `usuarios/${u}`), { banido: true });
-            const pSnap = await get(ref(db, 'posts'));
-            const posts = pSnap.val();
-            for(let id in posts) { if(posts[id].autor === u) await remove(ref(db, `posts/${id}`)); }
-        };
-
-        // PROFILE LOGIC
-        window.abrirPerfilAlheio = async (u) => {
-            const snap = await get(child(ref(db), `usuarios/${u}`));
-            const data = snap.val();
-            document.getElementById('view-modal-name').innerText = u;
-            document.getElementById('view-bio-text').innerText = data.bio || "Sem bio.";
-            document.getElementById('view-avatar-img').src = data.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+        // --- PERFIL ALHEIO ---
+        window.verPerfilOutro = async (u) => {
+            const s = await get(child(ref(db), `usuarios/${u}`)); const d = s.val(); if(!d) return;
+            document.getElementById('view-name').innerText = u + (d.verificado ? " 👑" : "");
+            document.getElementById('view-img').src = d.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            document.getElementById('view-bio').innerText = d.bio || "Sem bio.";
+            const l = document.getElementById('view-sobre-list'); l.innerHTML = "";
+            if(d.sobre) d.sobre.forEach(i => l.innerHTML += `<div style="background:#333; padding:5px; border-radius:5px; font-size:10px;"><b>${i.titulo}</b><br>${i.desc}</div>`);
+            document.getElementById('overlay-bg').style.display = 'block';
             document.getElementById('view-profile-modal').style.display = 'block';
-            document.getElementById('overlay').style.display = 'block';
         };
 
-        function recarregarSobre(itens) {
-            const l = document.getElementById('about-list'); l.innerHTML = ""; if(!itens) return;
-            itens.forEach(i => { l.innerHTML += `<div class="about-item"><b>${i.titulo}</b>${i.desc}</div>`; });
+        // --- UTILITÁRIOS ---
+        window.switchTab = (t) => {
+            document.querySelectorAll('.shop-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
+            document.getElementById('content-'+t).classList.add('active');
+            document.getElementById('tab-btn-'+t).classList.add('active');
+            if(t === 'game') startSnake(); else stopSnake();
+        };
+        document.getElementById('tab-btn-loja').onclick = () => switchTab('loja');
+        document.getElementById('tab-btn-game').onclick = () => switchTab('game');
+        document.getElementById('tab-btn-rank').onclick = () => switchTab('rank');
+
+        function renderRank(todos) {
+            const l = document.getElementById('ranking-list'); l.innerHTML = "";
+            let a = []; for(let n in todos) if(!todos[n].banido) a.push({n, p: todos[n].pontos||0, c: todos[n].nomeCor});
+            a.sort((a,b)=>b.p-a.p).forEach((u,i) => {
+                l.innerHTML += `
+                <div class="rank-row">
+                    <div>
+                        <span class="rank-pos">#${i+1}</span>
+                        <span style="color:${u.c||'white'}; font-weight:500;">${u.n}</span>
+                    </div>
+                    <span class="rank-pts">${u.p} pts</span>
+                </div>`;
+            });
         }
 
-        // EVENTOS
-        document.getElementById('btn-entrar').onclick = fazerLogin;
-        document.getElementById('btn-criar').onclick = async () => {
-            const user = document.getElementById('login-user').value.trim().toLowerCase();
-            const pass = document.getElementById('login-pass').value.trim();
-            if(!user || !pass) return;
-            await set(ref(db, `usuarios/${user}`), { senha: pass, banido: false, sobre: [], bio: "", avatar: "" });
-            alert("Criado!");
-        };
-
-        document.getElementById('btn-publicar').onclick = async () => {
-            const txt = document.getElementById('post-text').value.trim();
-            if(!txt && !postImageData) return;
-            const pRef = push(ref(db, 'posts'));
-            await set(pRef, { texto: txt, imagem: postImageData, autor: currentUser, dataMs: new Date().getTime(), id: pRef.key });
-            document.getElementById('post-preview').style.display = "none"; postImageData = ""; document.getElementById('post-text').value = "";
-        };
-
-        document.getElementById('post-image-input').onchange = (e) => {
-            const r = new FileReader(); r.onload = () => { postImageData = r.result; document.getElementById('post-preview').src = r.result; document.getElementById('post-preview').style.display = "block"; }; r.readAsDataURL(e.target.files[0]);
-        };
-
-        document.getElementById('btn-usuarios').onclick = () => {
-            document.getElementById('users-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block';
-            onValue(ref(db, 'usuarios'), (snap) => {
-                const list = document.getElementById('users-list-modal'); list.innerHTML = "";
-                const users = snap.val();
-                for(let n in users) {
-                    const dot = users[n].status === 'online' ? 'online' : 'offline';
-                    list.innerHTML += `<div class="user-item" onclick="window.abrirPerfilAlheio('${n}')"><div class="status-dot ${dot}"></div>${n}</div>`;
-                }
+        function renderSobre(itens) {
+            const l = document.getElementById('meu-sobre-lista'); l.innerHTML = "";
+            if(!itens) return;
+            itens.forEach((it, idx) => {
+                const d = document.createElement('div'); d.style="background:#333; padding:5px; margin-bottom:5px; border-radius:5px;";
+                d.innerHTML = `<b>${it.titulo}:</b> ${it.desc} <span style="color:red; float:right; cursor:pointer;" onclick="removeSobre(${idx})">×</span>`;
+                l.appendChild(d);
             });
+        }
+        window.removeSobre = async (idx) => {
+            const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || [];
+            list.splice(idx,1); await update(ref(db, `usuarios/${userAtual}`), {sobre: list});
         };
-
-        document.getElementById('open-profile-btn').onclick = () => { document.getElementById('profile-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
-        document.getElementById('open-about-btn').onclick = () => { document.getElementById('about-modal').style.display = 'block'; document.getElementById('overlay').style.display = 'block'; };
-        document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = (s.style.display==='block'?'none':'block'); };
-        document.getElementById('btn-logout').onclick = () => { localStorage.clear(); location.reload(); };
-        document.querySelectorAll('.btn-fechar').forEach(b => b.onclick = () => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); document.getElementById('overlay').style.display = 'none'; });
-
-        document.getElementById('profile-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
-        document.getElementById('bg-input').onchange = (e) => { const r = new FileReader(); r.onload = async () => await update(ref(db, `usuarios/${currentUser}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
-        document.getElementById('bio-input').onblur = async () => await update(ref(db, `usuarios/${currentUser}`), {bio: document.getElementById('bio-input').value});
-        
-        document.getElementById('btn-add-about').onclick = async () => {
-            const t = document.getElementById('about-title').value, d = document.getElementById('about-desc').value;
+        document.getElementById('btn-salvar-sobre').onclick = async () => {
+            const t = document.getElementById('input-sobre-titulo').value, d = document.getElementById('input-sobre-desc').value;
             if(!t || !d) return;
-            const s = await get(child(ref(db), `usuarios/${currentUser}/sobre`)); let sobre = s.val() || [];
-            sobre.push({titulo:t, desc:d});
-            await update(ref(db, `usuarios/${currentUser}`), {sobre: sobre});
-            document.getElementById('about-title').value = ""; document.getElementById('about-desc').value = "";
+            const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || [];
+            list.push({titulo:t, desc:d}); await update(ref(db, `usuarios/${userAtual}`), {sobre: list});
+            document.getElementById('input-sobre-titulo').value=""; document.getElementById('input-sobre-desc').value="";
         };
 
-        const logged = localStorage.getItem('loggedUser');
-        if(logged) abrirSessao(logged);
+        // Arquivos
+        document.getElementById('file-avatar').onchange = (e) => { const r=new FileReader(); r.onload=async()=>await update(ref(db, `usuarios/${userAtual}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('file-bg').onchange = (e) => { const r=new FileReader(); r.onload=async()=>await update(ref(db, `usuarios/${userAtual}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('edit-bio-input').onblur = async () => await update(ref(db, `usuarios/${userAtual}`), {bio: document.getElementById('edit-bio-input').value});
+
+        // ADM
+        document.getElementById('btn-login-adm').onclick = () => { if(document.getElementById('pass-mestre').value === "1234567890") alert("ADM Ativo!"); else alert("Senha incorreta!"); };
+
+        const salvo = localStorage.getItem('localnet_user'); if(salvo) logar(salvo);
     </script>
 </body>
 </html>
