@@ -3,415 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Localnet Cloud - Full Edition</title>
+    <title>Localnet Cloud - Pro</title>
     <style>
-        /* RESET E BASE */
-        html, body { height: 100%; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background-color: #121212; color: white; overflow: hidden; }
+        :root { --primary: #00ff88; --danger: #ff4444; --warn: #ffcc00; --bg: #0f0f0f; --card: #1a1a1a; --glass: rgba(255, 255, 255, 0.05); }
+        html, body { height: 100%; margin: 0; padding: 0; font-family: 'Inter', 'Segoe UI', sans-serif; background-color: var(--bg); color: white; overflow: hidden; }
         body { background-size: cover; background-position: center; transition: background 0.5s ease; display: flex; justify-content: center; align-items: center; }
         
-        button, .upload-box, .m-btn { cursor: pointer; border: none; transition: 0.2s; }
-        button:hover { filter: brightness(0.8); }
-        
-        /* CAMADAS (Z-INDEX) */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 500; }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1e1e1e; padding: 20px; border-radius: 20px; z-index: 1000; width: 320px; border: 1px solid #444; text-align: center; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
-        
-        /* UI PRINCIPAL */
-        .upload-box { border: 2px solid white; border-radius: 12px; display: flex; justify-content: center; align-items: center; background-color: rgba(30, 30, 30, 0.8); position: absolute; z-index: 100; }
-        .profile-trigger { width: 70px; height: 70px; top: 20px; left: 20px; }
-        .bg-upload { width: 45px; height: 45px; top: 105px; left: 20px; }
-        .logout-btn { width: 45px; height: 45px; top: 165px; left: 20px; border: 2px solid #ff4444; color: #ff4444; }
-        .central-btn { width: 45px; height: 45px; top: 20px; right: 20px; border: 2px solid #ffcc00; color: #ffcc00; font-size: 20px; }
-        .users-btn { width: 45px; height: 45px; top: 20px; right: 80px; border: 2px solid #00ff88; color: #00ff88; font-size: 20px; }
-        .admin-btn { width: 50px; height: 50px; bottom: 20px; right: 20px; border: 2px solid #ff0055; color: #ff0055; font-size: 22px; }
-        
-        #btn-toggle-posts { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); padding: 10px 25px; background: rgba(255,255,255,0.1); border: 1px solid white; color: white; border-radius: 20px; backdrop-filter: blur(5px); z-index: 150; font-weight: bold; }
+        button, .m-btn { cursor: pointer; border: none; transition: 0.3s; border-radius: 10px; font-weight: bold; }
+        button:hover { filter: brightness(1.2); transform: translateY(-1px); }
 
-        /* FEED E POSTS */
-        #posts-section { display: none; width: 90%; max-width: 380px; margin-top: 80px; background: rgba(20, 20, 20, 0.95); border-radius: 15px; padding: 15px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; z-index: 200; position: relative; }
-        .post-card { background: #252525; padding: 12px; border-radius: 10px; margin-top: 12px; border-left: 3px solid #00ff88; text-align: left; }
-        .post-image { width: 100%; border-radius: 10px; margin-top: 10px; }
+        textarea, input[type="text"], input[type="password"] { 
+            width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
+            background: var(--glass); color: white; outline: none; transition: 0.3s; box-sizing: border-box;
+        }
 
-        /* LOJA E SNAKE */
-        .shop-nav { display: flex; border-bottom: 1px solid #444; margin-bottom: 15px; }
-        .shop-tab { flex: 1; padding: 10px; cursor: pointer; font-size: 12px; background: #222; }
-        .shop-tab.active { background: #333; border-bottom: 2px solid #ffcc00; }
-        .shop-content { display: none; }
-        .shop-content.active { display: block; }
-        #snake-canvas { background: #000; display: block; margin: 10px auto; border: 2px solid #333; border-radius: 5px; }
+        .badge-v { color: var(--warn); margin-left: 5px; font-size: 14px; display: inline-block; vertical-align: middle; }
+        .noti-dot { position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg); display: none; z-index: 10; }
+
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; backdrop-filter: blur(8px); }
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); padding: 25px; border-radius: 24px; z-index: 1000; width: 340px; border: 1px solid #333; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+
+        .upload-box { border-radius: 18px; display: flex; justify-content: center; align-items: center; background: rgba(25, 25, 25, 0.8); position: absolute; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .profile-trigger { width: 75px; height: 75px; top: 20px; left: 20px; overflow: hidden; border: 2px solid var(--primary); }
+        .bg-upload { width: 45px; height: 45px; top: 110px; left: 20px; font-size: 20px; }
+        .logout-btn { width: 45px; height: 45px; top: 170px; left: 20px; color: var(--danger); border: 1px solid var(--danger); }
+        .central-btn { width: 45px; height: 45px; top: 20px; right: 20px; color: var(--warn); border: 1px solid var(--warn); }
+        .users-btn { width: 45px; height: 45px; top: 20px; right: 80px; color: var(--primary); border: 1px solid var(--primary); }
+        .admin-btn { width: 50px; height: 50px; bottom: 20px; right: 20px; color: #ff0055; border: 1px solid #ff0055; font-size: 24px; }
+
+        #btn-toggle-posts { position: absolute; top: 25px; left: 50%; transform: translateX(-50%); padding: 12px 35px; background: linear-gradient(135deg, var(--primary), #00cc6e); color: #000; border-radius: 50px; z-index: 150; font-weight: 900; }
+
+        #posts-section { display: none; width: 90%; max-width: 420px; margin-top: 90px; background: rgba(15, 15, 15, 0.95); border-radius: 25px; padding: 20px; border: 1px solid #333; max-height: 75vh; overflow-y: auto; z-index: 200; }
+        .post-card { background: #222; padding: 18px; border-radius: 15px; margin-top: 15px; border-left: 4px solid var(--primary); text-align: left; }
         
-        /* SETAS MOBILE FORMATO TECLADO */
-        .mobile-controls { display: grid; grid-template-columns: repeat(3, 50px); grid-template-rows: repeat(2, 50px); gap: 5px; justify-content: center; margin-top: 15px; }
-        .m-btn { background: #333; color: white; border: 1px solid #555; border-radius: 8px; font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #111; }
-        .m-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #111; }
-        #m-up { grid-column: 2; grid-row: 1; }
-        #m-left { grid-column: 1; grid-row: 2; }
-        #m-down { grid-column: 2; grid-row: 2; }
-        #m-right { grid-column: 3; grid-row: 2; }
-
-        .shop-item { background:#2a2a2a; padding:12px; border-radius:10px; border:1px solid #444; margin-bottom: 10px; }
+        .btn-main { width: 100%; padding: 14px; margin-bottom: 12px; background: #333; color: white; font-size: 14px; border-radius: 12px; }
+        .btn-primary { background: var(--primary); color: black; }
         
-        /* RANKING DESIGN */
-        .rank-row { display: flex; justify-content: space-between; padding: 8px 12px; background: #252525; border-radius: 8px; margin-bottom: 5px; border: 1px solid #333; align-items: center; }
-        .rank-pos { font-weight: bold; color: #ffcc00; margin-right: 10px; }
-        .rank-pts { font-size: 12px; color: #00ff88; background: #1a3326; padding: 2px 8px; border-radius: 10px; }
+        .row-item { display: flex; align-items: center; gap: 12px; padding: 15px; border-bottom: 1px solid #222; cursor: pointer; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .online { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
+        .offline { background: #444; }
 
-        input, textarea { width: 90%; margin: 10px auto; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #2a2a2a; color: white; display: block; }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .online { background-color: #00ff88; } .offline { background-color: #555; }
-        input[type="file"] { display: none !important; }
+        #chat-messages { height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; margin-bottom: 15px; background: #111; border-radius: 15px; }
+        .msg { max-width: 75%; padding: 10px 14px; border-radius: 15px; font-size: 14px; }
+        .msg.me { align-self: flex-end; background: var(--primary); color: black; }
+        .msg.them { align-self: flex-start; background: #333; color: white; }
+
+        #snake-canvas { background: #000; border: 2px solid #333; border-radius: 10px; display: block; margin: 0 auto; }
     </style>
 </head>
 <body>
 
     <div id="login-screen" class="modal" style="display:block;">
-        <h2>Localnet</h2>
-        <input type="text" id="login-user" placeholder="Usuário">
-        <input type="password" id="login-pass" placeholder="Senha">
-        <button id="btn-entrar" style="background:white; color:black; padding: 12px; border-radius: 8px; width:100%; font-weight:bold;">Entrar / Criar</button>
+        <h2>LOCALNET<span style="color:var(--primary)">CLOUD</span></h2>
+        <div style="margin-top:20px">
+            <input type="text" id="login-user" placeholder="Usuário">
+            <input type="password" id="login-pass" placeholder="Senha" style="margin-top:10px">
+            <button id="btn-entrar" class="btn-main btn-primary" style="margin-top:20px">ENTRAR</button>
+        </div>
     </div>
 
     <div id="main-page" style="display:none;">
-        <button id="btn-toggle-posts">CHATS / POSTS</button>
-        
-        <div class="upload-box profile-trigger" id="btn-meu-perfil">
+        <button id="btn-toggle-posts">FEED SOCIAL</button>
+        <div class="upload-box profile-trigger" id="btn-abrir-meu-perfil">
             <img id="main-avatar" style="width:100%; height:100%; object-fit:cover; display:none;">
-            <span id="main-icon" style="font-size: 25px;">👤</span>
+            <span id="main-icon" style="font-size:30px">👤</span>
         </div>
-        
-        <div class="upload-box bg-upload" id="btn-upload-bg"><span>🖼️</span></div>
-        <div class="upload-box logout-btn" id="btn-sair"><span>🚪</span></div>
-        <div class="upload-box central-btn" id="btn-abrir-central"><span>⭐</span></div>
-        <div class="upload-box users-btn" id="btn-lista-usuarios"><span>🌐</span></div>
-        <div class="upload-box admin-btn" id="btn-adm-acesso"><span>🛡️</span></div>
+        <div class="upload-box bg-upload" id="btn-upload-bg">🖼️</div>
+        <div class="upload-box logout-btn" id="btn-sair">🚪</div>
+        <div class="upload-box central-btn" id="btn-abrir-central">⭐ <div id="noti-central" class="noti-dot"></div></div>
+        <div class="upload-box users-btn" id="btn-lista-usuarios">🌐</div>
+        <div class="upload-box admin-btn" id="btn-adm-acesso">🛡️</div>
 
         <div id="posts-section">
-            <div style="display: flex; gap: 8px;">
-                <textarea id="post-text" placeholder="No que pensa?" style="height: 40px; margin:0; flex:1;"></textarea>
-                <button id="btn-add-foto" style="background:#333; color:white; padding:10px; border-radius:8px;">📎</button>
+            <div style="background: var(--glass); padding: 15px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
+                <textarea id="post-text" placeholder="No que você está pensando?" style="height: 60px; resize: none;"></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                    <button id="btn-add-foto" style="background:none; font-size:24px; color:var(--primary)">📷</button>
+                    <button id="btn-publicar" class="btn-primary" style="padding: 8px 25px;">POSTAR</button>
+                </div>
+                <img id="post-preview" style="width: 100%; display: none; margin-top: 15px; border-radius: 12px;">
             </div>
-            <img id="post-preview" style="width: 100%; height: 150px; object-fit: cover; display: none; margin: 10px 0; border-radius: 10px;">
-            <button id="btn-publicar" style="background: #00ff88; color: black; width: 100%; font-weight: bold; padding: 12px; border-radius: 8px; margin-top:5px;">Postar</button>
             <div id="feed"></div>
         </div>
     </div>
 
     <div id="central-modal" class="modal">
-        <h3>Central</h3>
-        <button id="nav-sobre" style="width:100%; padding:12px; margin-bottom:8px; background:#333; color:white; border-radius:8px;">⭐ Sobre Mim</button>
-        <button id="nav-loja" style="width:100%; padding:12px; background:#333; color:white; border-radius:8px;">🛒 Loja e Jogos</button>
-        <button class="btn-fechar-geral" style="margin-top:15px; width:100%; background:#ff4444; color:white; padding:10px; border-radius:8px;">Fechar</button>
+        <h3 style="color:var(--warn);">CENTRAL</h3>
+        <button id="nav-sobre" class="btn-main">📝 Editar "Sobre Mim"</button>
+        <button id="nav-amigos" class="btn-main" style="position:relative;">👥 Amigos <div id="noti-amigos-btn" class="noti-dot"></div></button>
+        <button id="nav-loja" class="btn-main">🕹️ Loja e Desafios</button>
+        <button class="btn-fechar-geral" style="color:var(--danger); background:none;">FECHAR</button>
     </div>
 
-    <div id="shop-modal" class="modal" style="width: 340px;">
-        <div class="shop-nav">
-            <div class="shop-tab active" id="tab-btn-loja">Loja</div>
-            <div class="shop-tab" id="tab-btn-game">Snake</div>
-            <div class="shop-tab" id="tab-btn-rank">Ranking</div>
-        </div>
-        
-        <div id="content-loja" class="shop-content active">
-            <p>Seus Pontos: <b id="saldo-display" style="color:#00ff88">0</b></p>
-            <div class="shop-item">👑 Verificado (30 pts)<div id="btn-compra-verificado"></div></div>
-            <div class="shop-item">🎨 Cor do Nome (50 pts)
-                <input type="color" id="color-picker" style="width:50px; height:30px; margin:5px auto; cursor:pointer;">
-                <div id="btn-compra-cor"></div>
-            </div>
-        </div>
+    <div id="about-edit-modal" class="modal">
+        <h3>SOBRE MIM</h3>
+        <input type="text" id="input-sobre-tit" placeholder="Título">
+        <input type="text" id="input-sobre-val" placeholder="Valor" style="margin-top:10px">
+        <button id="btn-add-sobre" class="btn-main btn-primary" style="margin-top:10px">ADICIONAR</button>
+        <div id="minha-lista-sobre" style="margin-top:15px; max-height:120px; overflow-y:auto;"></div>
+        <button id="btn-voltar-central-sobre" class="btn-main">VOLTAR</button>
+    </div>
 
-        <div id="content-game" class="shop-content">
-            <div style="font-size:14px; margin-bottom: 5px;">Pontos: <span id="snake-score" style="color:#00ff88; font-weight:bold;">0</span></div>
+    <div id="friends-modal" class="modal">
+        <h3>AMIGOS</h3>
+        <div id="lista-amigos" style="max-height: 250px; overflow-y: auto;"></div>
+        <button id="btn-voltar-central-amigos" class="btn-main" style="margin-top:10px">VOLTAR</button>
+    </div>
+
+    <div id="shop-modal" class="modal">
+        <div style="display:flex; gap:5px; margin-bottom:15px; background:#111; padding:5px; border-radius:12px;">
+            <button id="btn-tab-loja" style="flex:1; padding:8px;">LOJA</button>
+            <button id="btn-tab-game" style="flex:1; padding:8px;">SNAKE</button>
+            <button id="btn-tab-rank" style="flex:1; padding:8px;">RANK</button>
+        </div>
+        <div id="content-loja">
+             <div id="saldo-display" style="color:var(--primary); font-size:28px; font-weight:900;">0</div>
+             <div id="area-compra-verificado"></div>
+             <div id="area-compra-cor" style="margin-top:10px;"></div>
+             <input type="color" id="color-picker" style="width:100%; height:35px; margin-top:5px;">
+        </div>
+        <div id="content-game" style="display:none;">
             <canvas id="snake-canvas" width="200" height="200"></canvas>
-            <div class="mobile-controls">
-                <button class="m-btn" id="m-up">▲</button>
-                <button class="m-btn" id="m-left">◀</button>
-                <button class="m-btn" id="m-down">▼</button>
-                <button class="m-btn" id="m-right">▶</button>
+            <div style="display:grid; grid-template-columns: repeat(3, 45px); gap:8px; justify-content:center; margin-top:15px;">
+                <button class="m-btn" id="m-up" style="grid-column:2; height:45px; background:#333; color:white;">▲</button>
+                <button class="m-btn" id="m-left" style="grid-column:1; height:45px; background:#333; color:white;">◀</button>
+                <button class="m-btn" id="m-down" style="grid-column:2; height:45px; background:#333; color:white;">▼</button>
+                <button class="m-btn" id="m-right" style="grid-column:3; height:45px; background:#333; color:white;">▶</button>
             </div>
         </div>
-
-        <div id="content-rank" class="shop-content">
-            <h4>Recordes Globais 🏆</h4>
-            <div id="ranking-list" style="max-height:220px; overflow-y:auto; padding: 5px;"></div>
+        <div id="content-rank" style="display:none; max-height:220px; overflow-y:auto;">
+            <div id="ranking-list"></div>
         </div>
-        <button class="btn-fechar-geral" style="margin-top:15px; width:100%; background:#333; color:white; padding:10px; border-radius:8px;">Sair</button>
-    </div>
-
-    <div id="view-profile-modal" class="modal" style="z-index: 2000;">
-        <img id="view-img" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid #ffcc00;">
-        <h2 id="view-name"></h2>
-        <div id="view-bio" style="font-size:13px; background:#222; padding:10px; border-radius:8px; margin: 10px 0;"></div>
-        <div id="view-sobre-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;"></div>
-        <button onclick="fecharModais()" style="margin-top:15px; width:100%; background:#444; color:white; padding:10px; border-radius: 8px;">Fechar</button>
-    </div>
-
-    <div id="users-modal" class="modal">
-        <h3>Membros</h3>
-        <div id="lista-geral-usuarios" style="max-height: 250px; overflow-y: auto;"></div>
-        <button class="btn-fechar-geral" style="margin-top:10px; width:100%; background:#333; color:white; padding:10px; border-radius: 8px;">Fechar</button>
-    </div>
-
-    <div id="admin-modal" class="modal">
-        <h3>Acesso Mestre</h3>
-        <input type="password" id="pass-mestre" placeholder="Senha ADM">
-        <button id="btn-login-adm" style="background:#ff0055; color:white; width:100%; padding:10px; border-radius:8px;">Acessar</button>
-        <button class="btn-fechar-geral" style="margin-top:10px; background:transparent; color:gray;">Cancelar</button>
+        <button id="btn-voltar-central-loja" class="btn-main" style="margin-top:15px">VOLTAR</button>
     </div>
 
     <div id="my-profile-modal" class="modal">
-        <img id="edit-avatar-img" style="width:80px; height:80px; border-radius:15px; border:2px solid #fff; object-fit:cover;" onclick="document.getElementById('file-avatar').click()">
+        <img id="edit-avatar-img" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--primary); display:block; margin:0 auto;">
+        <button onclick="document.getElementById('file-avatar').click()" class="btn-main" style="margin-top:10px;">MUDAR FOTO</button>
         <h3 id="edit-name-display"></h3>
-        <textarea id="edit-bio-input" placeholder="Sua bio..."></textarea>
-        <button class="btn-fechar-geral" style="background: #00ff88; color:black; width:100%; font-weight:bold; padding:10px; border-radius: 8px;">Salvar</button>
+        <textarea id="edit-bio-input" placeholder="Bio..." style="height:60px; margin-top:10px;"></textarea>
+        <button class="btn-fechar-geral btn-main btn-primary" style="margin-top:15px">SALVAR</button>
     </div>
 
-    <div id="about-modal" class="modal">
-        <h3>Personalizar Perfil</h3>
-        <input type="text" id="input-sobre-titulo" placeholder="Ex: Hobbie">
-        <input type="text" id="input-sobre-desc" placeholder="Ex: Jogar">
-        <button id="btn-salvar-sobre" style="background: #ffcc00; width:100%; padding:10px; font-weight:bold; border-radius:8px;">Adicionar</button>
-        <div id="meu-sobre-lista" style="max-height:120px; overflow-y:auto; margin-top:10px;"></div>
-        <button id="btn-voltar-central" style="margin-top:10px; width:100%; background:#333; color:white; padding:10px; border-radius:8px;">Voltar</button>
+    <div id="users-modal" class="modal">
+        <h3>MEMBROS</h3>
+        <div id="lista-geral-users" style="max-height: 250px; overflow-y: auto;"></div>
+        <button class="btn-fechar-geral btn-main">FECHAR</button>
+    </div>
+
+    <div id="view-profile-modal" class="modal">
+        <button id="btn-add-amigo-acao" style="position:absolute; top:20px; right:20px; background:var(--primary); width:35px; height:35px; border-radius:50%;">+</button>
+        <img id="view-img" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--warn);">
+        <h2 id="view-name" style="margin-top:10px; display:flex; align-items:center; justify-content:center;"></h2>
+        <div id="view-sobre-list" style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:15px; max-height:150px; overflow-y:auto;"></div>
+        <button onclick="fecharModais()" class="btn-main" style="margin-top:15px">VOLTAR</button>
+    </div>
+
+    <div id="chat-modal" class="modal">
+        <h3 id="chat-title">Chat</h3>
+        <div id="chat-messages"></div>
+        <div style="display:flex; gap:8px;">
+            <input type="text" id="chat-input" placeholder="Mensagem...">
+            <button id="btn-send-chat" class="btn-primary" style="padding:0 12px;">➤</button>
+        </div>
+        <button id="btn-chat-back" class="btn-main" style="margin-top:10px">VOLTAR</button>
+    </div>
+
+    <div id="action-choice-modal" class="modal">
+        <h3 id="choice-name"></h3>
+        <button id="btn-go-profile" class="btn-main btn-primary">VER PERFIL</button>
+        <button id="btn-go-chat" class="btn-main" style="display:none;">ENVIAR MENSAGEM</button>
+        <button onclick="fecharModais()" style="color:gray; background:none; cursor:pointer;">Cancelar</button>
+    </div>
+
+    <div id="admin-modal" class="modal">
+        <h3>PAINEL ADM</h3>
+        <div id="admin-auth">
+            <input type="password" id="pass-mestre" placeholder="Chave Mestra">
+            <button id="btn-login-adm" class="btn-main" style="background:#ff0055; margin-top:10px;">LIBERAR</button>
+        </div>
+        <div id="admin-panel" style="display:none;">
+            <div id="admin-ban-list" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
+        <button class="btn-fechar-geral btn-main">FECHAR</button>
     </div>
 
     <div class="overlay" id="overlay-bg"></div>
-    <input type="file" id="file-avatar" accept="image/*">
-    <input type="file" id="file-bg" accept="image/*">
-    <input type="file" id="file-post" accept="image/*">
+    <input type="file" id="file-avatar" style="display:none">
+    <input type="file" id="file-bg" style="display:none">
+    <input type="file" id="file-post" style="display:none">
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, set, push, onValue, get, child, update, onDisconnect, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, push, onValue, get, child, update, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = { apiKey: "AIzaSyAdfasR5Z2Cd7ETQ2p_RreRkYK2q5pdlXI", authDomain: "localnet-45a7f.firebaseapp.com", projectId: "localnet-45a7f", storageBucket: "localnet-45a7f.firebasestorage.app", messagingSenderId: "54266406528", appId: "1:54266406528:web:5df0ac496ed214290f6865", databaseURL: "https://localnet-45a7f-default-rtdb.firebaseio.com" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         
-        let userAtual = "", ptsRecorde = 0, verificado = false, imgPostBase64 = "";
+        let userAtual = "", chatAtivo = "", ptsSaldo = 0, recordeAtual = 0, imgPostBase64 = "";
 
-        // --- CONTROLE DE INTERFACE ---
         window.fecharModais = () => {
             document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
             document.getElementById('overlay-bg').style.display = 'none';
-            stopSnake();
+            chatAtivo = ""; stopSnake();
         };
+        document.querySelectorAll('.btn-fechar-geral').forEach(b => b.onclick = fecharModais);
 
-        document.querySelectorAll('.btn-fechar-geral').forEach(btn => btn.addEventListener('click', fecharModais));
+        document.getElementById('btn-voltar-central-sobre').onclick = () => { fecharModais(); document.getElementById('central-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-voltar-central-amigos').onclick = () => { fecharModais(); document.getElementById('central-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-voltar-central-loja').onclick = () => { fecharModais(); document.getElementById('central-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-chat-back').onclick = () => { fecharModais(); document.getElementById('friends-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
 
-        // --- LOGIN ---
         document.getElementById('btn-entrar').onclick = async () => {
             const u = document.getElementById('login-user').value.toLowerCase().trim();
             const p = document.getElementById('login-pass').value;
             if(!u || !p) return;
-            const snap = await get(child(ref(db), `usuarios/${u}`));
-            if(snap.exists() && snap.val().senha === p) logar(u);
-            else if(!snap.exists()) { await set(ref(db, `usuarios/${u}`), {senha:p, pontos:0, status:"online"}); logar(u); }
-            else alert("Dados incorretos!");
+            const s = await get(child(ref(db), `usuarios/${u}`));
+            if(s.exists()){
+                if(s.val().banido) return alert("CONTA BANIDA.");
+                if(s.val().senha === p) logar(u); else alert("Senha incorreta.");
+            } else { await set(ref(db, `usuarios/${u}`), {senha:p, pontos:0, recorde:0, status:"online"}); logar(u); }
         };
 
         function logar(u) {
             userAtual = u; localStorage.setItem('localnet_user', u);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-page').style.display = 'block';
-            
-            set(ref(db, `usuarios/${u}/status`), "online");
-            onDisconnect(ref(db, `usuarios/${u}/status`)).set("offline");
+            update(ref(db, `usuarios/${u}`), {status: "online"});
+            onDisconnect(ref(db, `usuarios/${u}`)).update({status: "offline"});
 
-            onValue(ref(db, `usuarios/${u}`), (snap) => {
+            onValue(ref(db, `usuarios/${u}`), snap => {
                 const d = snap.val(); if(!d) return;
-                ptsRecorde = d.pontos || 0; verificado = d.verificado || false;
-                document.getElementById('saldo-display').innerText = ptsRecorde;
+                ptsSaldo = d.pontos || 0; recordeAtual = d.recorde || 0;
+                document.getElementById('saldo-display').innerText = ptsSaldo;
                 document.getElementById('edit-name-display').innerText = u;
-                document.getElementById('edit-name-display').style.color = d.nomeCor || "white";
-                
-                const btnV = document.getElementById('btn-compra-verificado');
-                btnV.innerHTML = d.verificado ? `<b style="color:#ffcc00">ATIVO ✅</b>` : `<button id="buy-v" style="background:#ffcc00; padding:5px; border-radius:5px;">Comprar</button>`;
-                if(document.getElementById('buy-v')) document.getElementById('buy-v').onclick = () => comprar('verificado', 30);
-
-                const btnC = document.getElementById('btn-compra-cor');
-                btnC.innerHTML = d.hasCor ? `<button id="apply-c" style="background:#00ff88; padding:5px; border-radius:5px;">Salvar Cor</button>` : `<button id="buy-c" style="background:#ffcc00; padding:5px; border-radius:5px;">Comprar Acesso</button>`;
-                if(document.getElementById('buy-c')) document.getElementById('buy-c').onclick = () => comprar('hasCor', 50);
-                if(document.getElementById('apply-c')) document.getElementById('apply-c').onclick = async () => await update(ref(db, `usuarios/${userAtual}`), {nomeCor: document.getElementById('color-picker').value});
-
+                document.getElementById('edit-name-display').style.color = d.nomeCor || 'white';
                 if(d.avatar) { document.getElementById('main-avatar').src = d.avatar; document.getElementById('main-avatar').style.display='block'; document.getElementById('main-icon').style.display='none'; document.getElementById('edit-avatar-img').src = d.avatar; }
                 if(d.bg) document.body.style.backgroundImage = `url('${d.bg}')`;
                 if(d.bio) document.getElementById('edit-bio-input').value = d.bio;
-                renderSobre(d.sobre);
+                renderSobreEdit(d.sobre);
+
+                document.getElementById('area-compra-verificado').innerHTML = d.verificado ? "👑 Membro Premium" : `<button id="buy-v" class="btn-main" style="background:var(--warn); color:black">👑 Virar Premium (30 pts)</button>`;
+                if(document.getElementById('buy-v')) document.getElementById('buy-v').onclick = () => comprar('verificado', 30);
+                document.getElementById('area-compra-cor').innerHTML = d.hasCor ? `<button id="save-c" class="btn-main btn-primary">Salvar Cor</button>` : `<button id="buy-c" class="btn-main" style="background:var(--warn); color:black">Liberar Cor (50 pts)</button>`;
+                if(document.getElementById('buy-c')) document.getElementById('buy-c').onclick = () => comprar('hasCor', 50);
+                if(document.getElementById('save-c')) document.getElementById('save-c').onclick = () => update(ref(db, `usuarios/${u}`), {nomeCor: document.getElementById('color-picker').value});
+
+                const temNoti = d.notificacoes && Object.values(d.notificacoes).some(v => v === true);
+                document.getElementById('noti-central').style.display = temNoti ? 'block' : 'none';
+                document.getElementById('noti-amigos-btn').style.display = temNoti ? 'block' : 'none';
             });
 
-            onValue(ref(db, 'usuarios'), (uSnap) => {
-                const todos = uSnap.val();
-                onValue(ref(db, 'posts'), (s) => renderFeed(s.val(), todos));
-                renderRank(todos);
-            });
-        }
-
-        async function comprar(campo, preco) {
-            if(ptsRecorde >= preco) {
-                let up = { pontos: ptsRecorde - preco }; up[campo] = true;
-                await update(ref(db, `usuarios/${userAtual}`), up);
-            } else alert("Pontos insuficientes!");
-        }
-
-        // --- BOTÕES PRINCIPAIS ---
-        document.getElementById('btn-meu-perfil').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('my-profile-modal').style.display='block'; };
-        document.getElementById('btn-upload-bg').onclick = () => document.getElementById('file-bg').click();
-        document.getElementById('btn-sair').onclick = () => { localStorage.clear(); location.reload(); };
-        document.getElementById('btn-abrir-central').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('central-modal').style.display='block'; };
-        document.getElementById('nav-sobre').onclick = () => { document.getElementById('central-modal').style.display='none'; document.getElementById('about-modal').style.display='block'; };
-        document.getElementById('nav-loja').onclick = () => { document.getElementById('central-modal').style.display='none'; document.getElementById('shop-modal').style.display='block'; window.switchTab('loja'); };
-        document.getElementById('btn-voltar-central').onclick = () => { document.getElementById('about-modal').style.display='none'; document.getElementById('central-modal').style.display='block'; };
-        document.getElementById('btn-adm-acesso').onclick = () => { document.getElementById('overlay-bg').style.display='block'; document.getElementById('admin-modal').style.display='block'; };
-        document.getElementById('btn-lista-usuarios').onclick = () => {
-            document.getElementById('overlay-bg').style.display='block';
-            document.getElementById('users-modal').style.display='block';
             onValue(ref(db, 'usuarios'), s => {
-                const l = document.getElementById('lista-geral-usuarios'); l.innerHTML = "";
-                for(let n in s.val()){
-                    const u = s.val()[n]; if(u.banido) continue;
-                    l.innerHTML += `<div style="padding:10px; border-bottom:1px solid #333; cursor:pointer;" onclick="verPerfilOutro('${n}')"><span class="status-dot ${u.status=='online'?'online':'offline'}"></span>${n}</div>`;
-                }
+                const todos = s.val();
+                renderMembros(todos); renderAmigos(todos); renderRank(todos); renderAdmin(todos);
+                onValue(ref(db, 'posts'), pSnap => renderFeed(pSnap.val(), todos));
             });
-        };
+        }
 
-        // --- SNAKE COM TECLADO INTEGRADO ---
+        // SNAKE E TECLADO
         const sCanvas = document.getElementById('snake-canvas'), sCtx = sCanvas.getContext('2d');
         let snake, food, dir, gLoop, sScore; const box = 10;
-        
-        function startSnake() { stopSnake(); snake=[{x:100,y:100}]; dir="RIGHT"; sScore=0; document.getElementById('snake-score').innerText=0; spawnFood(); gLoop=setInterval(drawS, 100); }
-        function stopSnake() { clearInterval(gLoop); }
-        function spawnFood() { food={x:Math.floor(Math.random()*19)*box, y:Math.floor(Math.random()*19)*box}; }
-        
-        function drawS() {
+
+        // AJUSTE DAS SETAS DO TECLADO - GLOBAL
+        window.addEventListener("keydown", (e) => {
+            if(e.key === "ArrowUp" && dir !== "DOWN") dir = "UP";
+            else if(e.key === "ArrowDown" && dir !== "UP") dir = "DOWN";
+            else if(e.key === "ArrowLeft" && dir !== "RIGHT") dir = "LEFT";
+            else if(e.key === "ArrowRight" && dir !== "LEFT") dir = "RIGHT";
+        });
+
+        function startSnake(){ stopSnake(); snake=[{x:100,y:100}]; dir="RIGHT"; sScore=0; spawnFood(); gLoop=setInterval(drawS,100); }
+        function stopSnake(){ clearInterval(gLoop); }
+        function spawnFood(){ food={x:Math.floor(Math.random()*19)*box, y:Math.floor(Math.random()*19)*box}; }
+        function drawS(){
             sCtx.fillStyle="black"; sCtx.fillRect(0,0,200,200);
-            snake.forEach((p,i)=> { sCtx.fillStyle=i==0?"#00ff88":"white"; sCtx.fillRect(p.x,p.y,box,box); });
+            snake.forEach((p,i)=>{ sCtx.fillStyle=i==0?"#00ff88":"white"; sCtx.fillRect(p.x,p.y,box,box); });
             sCtx.fillStyle="red"; sCtx.fillRect(food.x,food.y,box,box);
             let nX=snake[0].x, nY=snake[0].y;
             if(dir=="LEFT") nX-=box; if(dir=="UP") nY-=box; if(dir=="RIGHT") nX+=box; if(dir=="DOWN") nY+=box;
-            if(nX==food.x && nY==food.y){ sScore++; document.getElementById('snake-score').innerText=sScore; spawnFood(); } else snake.pop();
-            let head={x:nX, y:nY};
-            if(nX<0||nX>=200||nY<0||nY>=200||snake.some(s=>s.x==head.x&&s.y==head.y)){
-                if(sScore > 0) { 
-                    update(ref(db, `usuarios/${userAtual}`), {pontos: ptsRecorde + sScore});
-                    alert("Você ganhou " + sScore + " pontos!");
-                }
-                startSnake(); return;
+            if(nX==food.x && nY==food.y){ sScore++; spawnFood(); } else snake.pop();
+            let head={x:nX,y:nY};
+            if(nX<0||nX>=200||nY<0||nY>=200||snake.some(s=>s.x==head.x&&s.y==head.y)){ 
+                let up = { pontos: ptsSaldo + sScore }; if(sScore > recordeAtual) up.recorde = sScore;
+                update(ref(db, `usuarios/${userAtual}`), up); startSnake(); return; 
             }
             snake.unshift(head);
         }
 
-        window.addEventListener('keydown', (e) => {
-            const k = e.key;
-            if((k === "ArrowUp" || k === "w") && dir !== "DOWN") dir = "UP";
-            if((k === "ArrowDown" || k === "s") && dir !== "UP") dir = "DOWN";
-            if((k === "ArrowLeft" || k === "a") && dir !== "RIGHT") dir = "LEFT";
-            if((k === "ArrowRight" || k === "d") && dir !== "LEFT") dir = "RIGHT";
-        });
+        // MOBILE CLICKS
+        document.getElementById('m-up').onclick = () => { if(dir !== "DOWN") dir = "UP"; };
+        document.getElementById('m-down').onclick = () => { if(dir !== "UP") dir = "DOWN"; };
+        document.getElementById('m-left').onclick = () => { if(dir !== "RIGHT") dir = "LEFT"; };
+        document.getElementById('m-right').onclick = () => { if(dir !== "LEFT") dir = "RIGHT"; };
 
-        document.getElementById('m-up').onclick=()=> {if(dir!="DOWN")dir="UP"};
-        document.getElementById('m-down').onclick=()=> {if(dir!="UP")dir="DOWN"};
-        document.getElementById('m-left').onclick=()=> {if(dir!="RIGHT")dir="LEFT"};
-        document.getElementById('m-right').onclick=()=> {if(dir!="LEFT")dir="RIGHT"};
-
-        // --- POSTS ---
-        document.getElementById('btn-toggle-posts').onclick = () => {
-            const s = document.getElementById('posts-section');
-            s.style.display = s.style.display === 'block' ? 'none' : 'block';
-        };
-        document.getElementById('btn-add-foto').onclick = () => document.getElementById('file-post').click();
-        document.getElementById('file-post').onchange = (e) => {
-            const r = new FileReader(); r.onload = () => {
-                imgPostBase64 = r.result;
-                document.getElementById('post-preview').src = r.result;
-                document.getElementById('post-preview').style.display = "block";
-            }; r.readAsDataURL(e.target.files[0]);
-        };
-        document.getElementById('btn-publicar').onclick = async () => {
-            const t = document.getElementById('post-text').value.trim();
-            if(t || imgPostBase64) {
-                await set(push(ref(db, 'posts')), {texto: t, imagem: imgPostBase64, autor: userAtual});
-                document.getElementById('post-text').value = ""; document.getElementById('post-preview').style.display = "none"; imgPostBase64 = "";
+        function renderMembros(todos) {
+            const l = document.getElementById('lista-geral-users'); l.innerHTML = "";
+            for(let n in todos) {
+                if(n === userAtual || todos[n].banido) continue;
+                const d = document.createElement('div'); d.className = "row-item";
+                d.onclick = () => { abrirEscolha(n); document.getElementById('btn-go-chat').style.display='none'; };
+                d.innerHTML = `<img src="${todos[n].avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                               <span style="flex:1; color:${todos[n].nomeCor || 'white'}">${n}${todos[n].verificado ? '<span class="badge-v">👑</span>' : ''}</span><div class="status-dot ${todos[n].status=='online'?'online':'offline'}"></div>`;
+                l.appendChild(d);
             }
+        }
+
+        function renderAmigos(todos) {
+            const eu = todos[userAtual]; const l = document.getElementById('lista-amigos'); l.innerHTML = "";
+            if(eu?.amigos) {
+                eu.amigos.forEach(n => {
+                    const amg = todos[n]; if(!amg || amg.banido) return;
+                    const noti = eu.notificacoes && eu.notificacoes[n];
+                    const d = document.createElement('div'); d.className = "row-item";
+                    d.onclick = () => { abrirEscolha(n); document.getElementById('btn-go-chat').style.display='block'; };
+                    d.innerHTML = `<img src="${amg.avatar || 'https://cdn-icons-png.flaticon.com/512/149/149071.png'}" style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+                                   <span style="flex:1; color:${amg.nomeCor||'white'};">${n}${amg.verificado ? '<span class="badge-v">👑</span>' : ''}</span>
+                                   ${noti ? '<div class="noti-dot" style="display:block; right:45px; top:20px;"></div>' : ''}
+                                   <div class="status-dot ${amg.status=='online'?'online':'offline'}"></div>`;
+                    l.appendChild(d);
+                });
+            }
+        }
+
+        function renderRank(todos) {
+            const l = document.getElementById('ranking-list'); l.innerHTML = "";
+            let a = []; for(let n in todos) if(!todos[n].banido) a.push({n, rec: todos[n].recorde||0, cor: todos[n].nomeCor});
+            a.sort((a,b)=>b.rec-a.rec).forEach((u,i) => {
+                l.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #222;">
+                    <span style="color:${u.cor || 'white'}">${i+1}º ${u.n}</span> <span style="color:var(--primary)">${u.rec}</span>
+                </div>`;
+            });
+        }
+
+        window.verPerfilOutro = async (u) => {
+            const s = await get(child(ref(db), `usuarios/${u}`)); const d = s.val(); if(!d) return;
+            document.getElementById('view-name').innerHTML = `${u} ${d.verificado ? '<span class="badge-v">👑</span>' : ''}`;
+            document.getElementById('view-name').style.color = d.nomeCor || 'white';
+            document.getElementById('view-img').src = d.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+            const sl = document.getElementById('view-sobre-list'); sl.innerHTML = "";
+            if(d.sobre) d.sobre.forEach(i => sl.innerHTML += `<div style="background:#111; padding:5px; border-radius:8px; font-size:11px;"><b>${i.titulo}</b><br>${i.desc}</div>`);
+            document.getElementById('btn-add-amigo-acao').onclick = async () => {
+                const myS = await get(child(ref(db), `usuarios/${userAtual}/amigos`)); let list = myS.val() || [];
+                if(!list.includes(u)) { list.push(u); update(ref(db, `usuarios/${userAtual}`), {amigos: list}); alert("ADICIONADO!"); }
+            };
+            document.getElementById('view-profile-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block';
         };
 
         function renderFeed(posts, todos) {
             const f = document.getElementById('feed'); f.innerHTML = ""; if(!posts) return;
             Object.keys(posts).reverse().forEach(id => {
-                const p = posts[id]; const d = todos[p.autor];
-                if(d?.banido) return;
-                const card = document.createElement('div'); card.className = 'post-card';
-                card.innerHTML = `<b style="color:${d?.nomeCor || '#00ff88'}; cursor:pointer;" onclick="verPerfilOutro('${p.autor}')">${p.autor}${d?.verificado?' 👑':''}</b><p>${p.texto}</p>${p.imagem?`<img src="${p.imagem}" class="post-image">`:""}`;
-                f.appendChild(card);
+                const p = posts[id]; const d = todos[p.autor]; if(!d || d.banido) return;
+                f.innerHTML += `<div class="post-card"><b style="color:${d.nomeCor||'var(--primary)'}; cursor:pointer" onclick="verPerfilOutro('${p.autor}')">${p.autor}${d.verificado ? '<span class="badge-v">👑</span>' : ''}</b><p>${p.texto}</p>${p.imagem?`<img src="${p.imagem}" style="width:100%; border-radius:12px; margin-top:10px;">`:""}</div>`;
             });
         }
 
-        // --- PERFIL ALHEIO ---
-        window.verPerfilOutro = async (u) => {
-            const s = await get(child(ref(db), `usuarios/${u}`)); const d = s.val(); if(!d) return;
-            document.getElementById('view-name').innerText = u + (d.verificado ? " 👑" : "");
-            document.getElementById('view-img').src = d.avatar || "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-            document.getElementById('view-bio').innerText = d.bio || "Sem bio.";
-            const l = document.getElementById('view-sobre-list'); l.innerHTML = "";
-            if(d.sobre) d.sobre.forEach(i => l.innerHTML += `<div style="background:#333; padding:5px; border-radius:5px; font-size:10px;"><b>${i.titulo}</b><br>${i.desc}</div>`);
-            document.getElementById('overlay-bg').style.display = 'block';
-            document.getElementById('view-profile-modal').style.display = 'block';
-        };
-
-        // --- UTILITÁRIOS ---
-        window.switchTab = (t) => {
-            document.querySelectorAll('.shop-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.shop-tab').forEach(b => b.classList.remove('active'));
-            document.getElementById('content-'+t).classList.add('active');
-            document.getElementById('tab-btn-'+t).classList.add('active');
-            if(t === 'game') startSnake(); else stopSnake();
-        };
-        document.getElementById('tab-btn-loja').onclick = () => switchTab('loja');
-        document.getElementById('tab-btn-game').onclick = () => switchTab('game');
-        document.getElementById('tab-btn-rank').onclick = () => switchTab('rank');
-
-        function renderRank(todos) {
-            const l = document.getElementById('ranking-list'); l.innerHTML = "";
-            let a = []; for(let n in todos) if(!todos[n].banido) a.push({n, p: todos[n].pontos||0, c: todos[n].nomeCor});
-            a.sort((a,b)=>b.p-a.p).forEach((u,i) => {
-                l.innerHTML += `
-                <div class="rank-row">
-                    <div>
-                        <span class="rank-pos">#${i+1}</span>
-                        <span style="color:${u.c||'white'}; font-weight:500;">${u.n}</span>
-                    </div>
-                    <span class="rank-pts">${u.p} pts</span>
-                </div>`;
-            });
+        window.abrirEscolha = (n) => { document.getElementById('choice-name').innerText = n; document.getElementById('action-choice-modal').style.display = 'block'; document.getElementById('overlay-bg').style.display = 'block'; document.getElementById('btn-go-profile').onclick = () => { fecharModais(); verPerfilOutro(n); }; document.getElementById('btn-go-chat').onclick = () => { fecharModais(); abrirChat(n); }; };
+        window.abrirChat = async (n) => { chatAtivo = n; document.getElementById('chat-title').innerText = "CONVERSA: " + n; document.getElementById('chat-modal').style.display = 'block'; document.getElementById('overlay-bg').style.display = 'block'; update(ref(db, `usuarios/${userAtual}/notificacoes`), {[n]: false}); const chatId = [userAtual, n].sort().join("_"); onValue(ref(db, `chats/${chatId}`), snap => { if(chatAtivo !== n) return; const mBox = document.getElementById('chat-messages'); mBox.innerHTML = ""; if(snap.val()) Object.values(snap.val()).forEach(m => { const div = document.createElement('div'); div.className = `msg ${m.u === userAtual ? 'me' : 'them'}`; div.innerText = m.t; mBox.appendChild(div); }); mBox.scrollTop = mBox.scrollHeight; }); };
+        document.getElementById('btn-send-chat').onclick = () => { const t = document.getElementById('chat-input').value.trim(); if(!t || !chatAtivo) return; const chatId = [userAtual, chatAtivo].sort().join("_"); push(ref(db, `chats/${chatId}`), {u: userAtual, t: t}); document.getElementById('chat-input').value = ""; update(ref(db, `usuarios/${chatAtivo}/notificacoes`), {[userAtual]: true}); };
+        
+        function switchTab(t) {
+            document.getElementById('content-loja').style.display = t==='loja'?'block':'none';
+            document.getElementById('content-game').style.display = t==='game'?'block':'none';
+            document.getElementById('content-rank').style.display = t==='rank'?'block':'none';
+            if(t==='game') startSnake(); else stopSnake();
         }
+        document.getElementById('btn-tab-loja').onclick = () => switchTab('loja');
+        document.getElementById('btn-tab-game').onclick = () => switchTab('game');
+        document.getElementById('btn-tab-rank').onclick = () => switchTab('rank');
 
-        function renderSobre(itens) {
-            const l = document.getElementById('meu-sobre-lista'); l.innerHTML = "";
-            if(!itens) return;
-            itens.forEach((it, idx) => {
-                const d = document.createElement('div'); d.style="background:#333; padding:5px; margin-bottom:5px; border-radius:5px;";
-                d.innerHTML = `<b>${it.titulo}:</b> ${it.desc} <span style="color:red; float:right; cursor:pointer;" onclick="removeSobre(${idx})">×</span>`;
-                l.appendChild(d);
-            });
-        }
-        window.removeSobre = async (idx) => {
-            const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || [];
-            list.splice(idx,1); await update(ref(db, `usuarios/${userAtual}`), {sobre: list});
-        };
-        document.getElementById('btn-salvar-sobre').onclick = async () => {
-            const t = document.getElementById('input-sobre-titulo').value, d = document.getElementById('input-sobre-desc').value;
-            if(!t || !d) return;
-            const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || [];
-            list.push({titulo:t, desc:d}); await update(ref(db, `usuarios/${userAtual}`), {sobre: list});
-            document.getElementById('input-sobre-titulo').value=""; document.getElementById('input-sobre-desc').value="";
-        };
-
-        // Arquivos
-        document.getElementById('file-avatar').onchange = (e) => { const r=new FileReader(); r.onload=async()=>await update(ref(db, `usuarios/${userAtual}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
-        document.getElementById('file-bg').onchange = (e) => { const r=new FileReader(); r.onload=async()=>await update(ref(db, `usuarios/${userAtual}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
-        document.getElementById('edit-bio-input').onblur = async () => await update(ref(db, `usuarios/${userAtual}`), {bio: document.getElementById('edit-bio-input').value});
-
-        // ADM
-        document.getElementById('btn-login-adm').onclick = () => { if(document.getElementById('pass-mestre').value === "1234567890") alert("ADM Ativo!"); else alert("Senha incorreta!"); };
+        document.getElementById('btn-abrir-meu-perfil').onclick = () => { document.getElementById('my-profile-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-abrir-central').onclick = () => { document.getElementById('central-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('nav-amigos').onclick = () => { fecharModais(); document.getElementById('friends-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('nav-sobre').onclick = () => { fecharModais(); document.getElementById('about-edit-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('nav-loja').onclick = () => { fecharModais(); document.getElementById('shop-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; switchTab('loja'); };
+        document.getElementById('btn-lista-usuarios').onclick = () => { document.getElementById('users-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-adm-acesso').onclick = () => { document.getElementById('admin-modal').style.display='block'; document.getElementById('overlay-bg').style.display='block'; };
+        document.getElementById('btn-sair').onclick = () => { localStorage.clear(); location.reload(); };
+        document.getElementById('btn-upload-bg').onclick = () => document.getElementById('file-bg').click();
+        document.getElementById('file-avatar').onchange = (e) => { const r=new FileReader(); r.onload=()=>update(ref(db, `usuarios/${userAtual}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('file-bg').onchange = (e) => { const r=new FileReader(); r.onload=()=>update(ref(db, `usuarios/${userAtual}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('edit-bio-input').onblur = () => update(ref(db, `usuarios/${userAtual}`), {bio: document.getElementById('edit-bio-input').value});
+        document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
+        document.getElementById('btn-add-foto').onclick = () => document.getElementById('file-post').click();
+        document.getElementById('file-post').onchange = (e) => { const r = new FileReader(); r.onload = () => { imgPostBase64 = r.result; document.getElementById('post-preview').src = r.result; document.getElementById('post-preview').style.display = "block"; }; r.readAsDataURL(e.target.files[0]); };
+        document.getElementById('btn-publicar').onclick = () => { const t = document.getElementById('post-text').value.trim(); if(t || imgPostBase64) { push(ref(db, 'posts'), {texto: t, imagem: imgPostBase64, autor: userAtual}); document.getElementById('post-text').value = ""; document.getElementById('post-preview').style.display = "none"; imgPostBase64 = ""; } };
+        window.comprar = (c, p) => { if(ptsSaldo >= p) { let up = { pontos: ptsSaldo-p }; up[c] = true; update(ref(db, `usuarios/${userAtual}`), up); } else alert("SEM PONTOS!"); };
+        document.getElementById('btn-add-sobre').onclick = async () => { const t = document.getElementById('input-sobre-tit').value, v = document.getElementById('input-sobre-val').value; if(!t || !v) return; const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || []; list.push({titulo:t, desc:v}); update(ref(db, `usuarios/${userAtual}`), {sobre: list}); document.getElementById('input-sobre-tit').value=""; document.getElementById('input-sobre-val').value=""; };
+        function renderSobreEdit(itens) { const l = document.getElementById('minha-lista-sobre'); l.innerHTML = ""; if(itens) itens.forEach((it, idx) => { l.innerHTML += `<div style="padding:5px; font-size:12px;"><b>${it.titulo}:</b> ${it.desc} <span onclick="removeSobre(${idx})" style="color:red; cursor:pointer">✖</span></div>`; }); }
+        window.removeSobre = async (idx) => { const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || []; list.splice(idx,1); update(ref(db, `usuarios/${userAtual}`), {sobre: list}); };
+        document.getElementById('btn-login-adm').onclick = () => { if(document.getElementById('pass-mestre').value === "12345678900987654321") { document.getElementById('admin-auth').style.display = 'none'; document.getElementById('admin-panel').style.display = 'block'; } };
+        function renderAdmin(todos) { const l = document.getElementById('admin-ban-list'); l.innerHTML = ""; for(let n in todos) { const b = todos[n].banido; l.innerHTML += `<div class="row-item">${n} <button onclick="toggleBan('${n}', ${b})" style="background:${b?'green':'red'}; padding:5px;">${b?'ON':'OFF'}</button></div>`; } }
+        window.toggleBan = (u, b) => update(ref(db, `usuarios/${u}`), {banido: !b});
 
         const salvo = localStorage.getItem('localnet_user'); if(salvo) logar(salvo);
     </script>
