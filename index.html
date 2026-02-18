@@ -2,7 +2,7 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Localnet Cloud - Pro</title>
     <style>
         :root { --primary: #00ff88; --danger: #ff4444; --warn: #ffcc00; --bg: #0f0f0f; --card: #1a1a1a; --glass: rgba(255, 255, 255, 0.05); }
@@ -15,13 +15,16 @@
         textarea, input[type="text"], input[type="password"] { 
             width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); 
             background: var(--glass); color: white; outline: none; transition: 0.3s; box-sizing: border-box;
+            font-size: 16px; /* Impede zoom no mobile */
         }
 
         .badge-v { color: var(--warn); margin-left: 5px; font-size: 14px; display: inline-block; vertical-align: middle; }
         .noti-dot { position: absolute; top: -2px; right: -2px; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; border: 2px solid var(--bg); display: none; z-index: 10; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 500; backdrop-filter: blur(8px); }
-        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); padding: 25px; border-radius: 24px; z-index: 1000; width: 340px; border: 1px solid #333; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        
+        /* MODAL GERAL - Z-INDEX ALTO */
+        .modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); padding: 25px; border-radius: 24px; z-index: 2000; width: 340px; border: 1px solid #333; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
 
         .upload-box { border-radius: 18px; display: flex; justify-content: center; align-items: center; background: rgba(25, 25, 25, 0.8); position: absolute; z-index: 100; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .profile-trigger { width: 75px; height: 75px; top: 20px; left: 20px; overflow: hidden; border: 2px solid var(--primary); }
@@ -44,6 +47,7 @@
         .online { background: var(--primary); box-shadow: 0 0 8px var(--primary); }
         .offline { background: #444; }
 
+        /* CHAT E MENSAGENS */
         #chat-messages { height: 250px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; margin-bottom: 15px; background: #111; border-radius: 15px; }
         .msg { max-width: 75%; padding: 10px 14px; border-radius: 15px; font-size: 14px; }
         .msg.me { align-self: flex-end; background: var(--primary); color: black; }
@@ -263,11 +267,9 @@
             });
         }
 
-        // SNAKE E TECLADO
         const sCanvas = document.getElementById('snake-canvas'), sCtx = sCanvas.getContext('2d');
         let snake, food, dir, gLoop, sScore; const box = 10;
 
-        // AJUSTE DAS SETAS DO TECLADO - GLOBAL
         window.addEventListener("keydown", (e) => {
             if(e.key === "ArrowUp" && dir !== "DOWN") dir = "UP";
             else if(e.key === "ArrowDown" && dir !== "UP") dir = "DOWN";
@@ -293,7 +295,6 @@
             snake.unshift(head);
         }
 
-        // MOBILE CLICKS
         document.getElementById('m-up').onclick = () => { if(dir !== "DOWN") dir = "UP"; };
         document.getElementById('m-down').onclick = () => { if(dir !== "UP") dir = "DOWN"; };
         document.getElementById('m-left').onclick = () => { if(dir !== "RIGHT") dir = "LEFT"; };
@@ -385,17 +386,15 @@
         document.getElementById('btn-upload-bg').onclick = () => document.getElementById('file-bg').click();
         document.getElementById('file-avatar').onchange = (e) => { const r=new FileReader(); r.onload=()=>update(ref(db, `usuarios/${userAtual}`), {avatar: r.result}); r.readAsDataURL(e.target.files[0]); };
         document.getElementById('file-bg').onchange = (e) => { const r=new FileReader(); r.onload=()=>update(ref(db, `usuarios/${userAtual}`), {bg: r.result}); r.readAsDataURL(e.target.files[0]); };
-        document.getElementById('edit-bio-input').onblur = () => update(ref(db, `usuarios/${userAtual}`), {bio: document.getElementById('edit-bio-input').value});
         document.getElementById('btn-toggle-posts').onclick = () => { const s = document.getElementById('posts-section'); s.style.display = s.style.display === 'block' ? 'none' : 'block'; };
         document.getElementById('btn-add-foto').onclick = () => document.getElementById('file-post').click();
         document.getElementById('file-post').onchange = (e) => { const r = new FileReader(); r.onload = () => { imgPostBase64 = r.result; document.getElementById('post-preview').src = r.result; document.getElementById('post-preview').style.display = "block"; }; r.readAsDataURL(e.target.files[0]); };
         document.getElementById('btn-publicar').onclick = () => { const t = document.getElementById('post-text').value.trim(); if(t || imgPostBase64) { push(ref(db, 'posts'), {texto: t, imagem: imgPostBase64, autor: userAtual}); document.getElementById('post-text').value = ""; document.getElementById('post-preview').style.display = "none"; imgPostBase64 = ""; } };
         window.comprar = (c, p) => { if(ptsSaldo >= p) { let up = { pontos: ptsSaldo-p }; up[c] = true; update(ref(db, `usuarios/${userAtual}`), up); } else alert("SEM PONTOS!"); };
-        document.getElementById('btn-add-sobre').onclick = async () => { const t = document.getElementById('input-sobre-tit').value, v = document.getElementById('input-sobre-val').value; if(!t || !v) return; const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || []; list.push({titulo:t, desc:v}); update(ref(db, `usuarios/${userAtual}`), {sobre: list}); document.getElementById('input-sobre-tit').value=""; document.getElementById('input-sobre-val').value=""; };
-        function renderSobreEdit(itens) { const l = document.getElementById('minha-lista-sobre'); l.innerHTML = ""; if(itens) itens.forEach((it, idx) => { l.innerHTML += `<div style="padding:5px; font-size:12px;"><b>${it.titulo}:</b> ${it.desc} <span onclick="removeSobre(${idx})" style="color:red; cursor:pointer">✖</span></div>`; }); }
-        window.removeSobre = async (idx) => { const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || []; list.splice(idx,1); update(ref(db, `usuarios/${userAtual}`), {sobre: list}); };
+        document.getElementById('btn-add-sobre').onclick = async () => { const t = document.getElementById('input-sobre-tit').value, v = document.getElementById('input-sobre-val').value; if(!t || !v) return; const s = await get(child(ref(db), `usuarios/${userAtual}/sobre`)); let list = s.val() || []; list.push({titulo:t, desc:v}); update(ref(db, `usuarios/${userAtual}`), {sobre: list}); };
+        function renderSobreEdit(itens) { const l = document.getElementById('minha-lista-sobre'); l.innerHTML = ""; if(itens) itens.forEach((it, idx) => { l.innerHTML += `<div>${it.titulo}: ${it.desc}</div>`; }); }
         document.getElementById('btn-login-adm').onclick = () => { if(document.getElementById('pass-mestre').value === "12345678900987654321") { document.getElementById('admin-auth').style.display = 'none'; document.getElementById('admin-panel').style.display = 'block'; } };
-        function renderAdmin(todos) { const l = document.getElementById('admin-ban-list'); l.innerHTML = ""; for(let n in todos) { const b = todos[n].banido; l.innerHTML += `<div class="row-item">${n} <button onclick="toggleBan('${n}', ${b})" style="background:${b?'green':'red'}; padding:5px;">${b?'ON':'OFF'}</button></div>`; } }
+        function renderAdmin(todos) { const l = document.getElementById('admin-ban-list'); l.innerHTML = ""; for(let n in todos) { const b = todos[n].banido; l.innerHTML += `<div>${n} <button onclick="toggleBan('${n}', ${b})">${b?'ON':'OFF'}</button></div>`; } }
         window.toggleBan = (u, b) => update(ref(db, `usuarios/${u}`), {banido: !b});
 
         const salvo = localStorage.getItem('localnet_user'); if(salvo) logar(salvo);
